@@ -1,0 +1,10 @@
+ZONEID ZONEDESC             PRICE  
+------ -------------------- -------
+1      Toronto              5.00   
+2      North York           7.00   
+3      Mississauga          8.00   
+4      Etobicoke            8.00   
+5      CDF                  0.00   
+6      Transylvania         12.00  
+7      Atlantis             12.00  
+8      Mars                 50.00  

@@ -1,0 +1,26 @@
+BARCODE              PRICE      PRODDESC                                           MFG                  SUPPLIER             TAXABLE CATEGORY             SALE_PERCENT
+-------------------- ---------- -------------------------------------------------- -------------------- -------------------- ------- -------------------- ------------
+1001                 3.38       Apple juice                                        Oceanspray           XYZ                  1       Beverage             0.00        
+1002                 2.56       Orange juice                                       Tropicana            XYZ                  1       Beverage             0.10        
+1003                 4.21       Lemonade                                           Oceanspray           XYZ                  1       Beverage             0.00        
+1004                 1.35       Chocolate drink                                    Hershey              XYZ                  1       Beverage             0.00        
+1005                 0.96       Gatorade                                           Gatorade             XYZ                  1       Beverage             0.00        
+1006                 2.99       Milk homogenised 2% 4L                             Dairy Farms          XYZ                  1       Beverage             0.00        
+1007                 2.39       Celestial seasonings tea                           Bigelow              XYZ                  1       Beverage             0.20        
+1008                 3.15       Special K 12oz                                     Kellogg              XYZ                  1       Cereal               0.00        
+1009                 1.85       Oatmeal cereal                                     Quaker               XYZ                  1       Cereal               0.00        
+1010                 5.24       Waffles                                            Eggo                 XYZ                  1       Cereal               0.00        
+1011                 9.95       Sunflower cooking oil, 34oz                        Crisco               XYZ                  1       Cooking              0.05        
+1012                 3.58       Distilled white vinegar                            Crisco               XYZ                  1       Cooking              0.00        
+1013                 1.49       Ketchup                                            Heinz                XYZ                  1       Pasta                0.00        
+1014                 1.75       Seafood cocktail sauce                             Heinz                XYZ                  1       Cooking              0.00        
+1015                 0.98       Pizza sauce                                        Heinz                XYZ                  1       Cooking              0.00        
+1016                 2.68       Paprika                                            McCormicj            XYZ                  1       Cooking              0.15        
+1017                 1.98       Shake 'n bake chicken                              Quaker               XYZ                  1       Cooking              0.00        
+1018                 0.88       Crushed tomatoes                                   Hunts                XYZ                  1       Vegetables           0.00        
+1019                 3.12       Dried tomatoes                                     Hunts                XYZ                  1       Vegetables           0.10        
+1020                 1.44       Mashed potatoes                                    Hamburger helper     XYZ                  1       Vegetables           0.00        
+1021                 5.28       Garlic                                             Hunts                XYZ                  1       Vegetables           0.00        
+1022                 2.85       Whole kernel corn                                  Hamburger helper     XYZ                  1       Vegetables           0.00        
+1023                 2.15       Spaghetti                                          Hamburger helper     XYZ                  1       Pasta                0.20        
+1024                 1.24       Flavoured rice                                     Hamburger helper     XYZ                  1       Pasta                0.00        
