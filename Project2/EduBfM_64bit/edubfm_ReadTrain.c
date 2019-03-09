@@ -83,6 +83,6 @@ Four edubfm_ReadTrain(
         e = RDsM_ReadTrain(trainId, aTrain, 4);
     }
 
-    return( eNOERROR );
+    return( e );
 
 }  /* edubfm_ReadTrain */
