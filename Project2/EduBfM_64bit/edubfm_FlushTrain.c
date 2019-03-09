@@ -73,6 +73,7 @@ Four edubfm_FlushTrain(
 	if (RM_IS_ROLLBACK_REQUIRED()) ERR(eNOTSUPPORTED_EDUBFM);
 
     index = edubfm_LookUp(trainId, type);
+    if (index < 0) ERR(eBADHASHKEY_BFM);
 
     bits = BI_BITS(type, index);
     if(bits & 0x80)
