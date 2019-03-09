@@ -66,12 +66,23 @@ Four edubfm_FlushTrain(
 {
     Four 			e;			/* for errors */
     Four 			index;			/* for an index */
+    One             bits;       /* for flags */
 
 
 	/* Error check whether using not supported functionality by EduBfM */
 	if (RM_IS_ROLLBACK_REQUIRED()) ERR(eNOTSUPPORTED_EDUBFM);
 
+    index = edubfm_LookUp(trainId, type);
 
+    bits = BI_BITS(type, index);
+    if(bits & 0x80)
+    {
+        // Write to disk if buffer is dirty
+        RDsM_WriteTrain(BI_BUFFER(type, index), trainId, type);
+
+        // Unset dirty bit
+        BI_BITS(type, index) &= 0x7F;
+    }
 	
     return( eNOERROR );
 
