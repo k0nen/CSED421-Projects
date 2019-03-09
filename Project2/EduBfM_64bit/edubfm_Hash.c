@@ -84,6 +84,7 @@ Four edubfm_Insert(
 {
     Four 		i;			
     Two  		hashValue;
+    Two         insertIndex;
 
 
     CHECKKEY(key);    /*@ check validity of key */
@@ -91,7 +92,15 @@ Four edubfm_Insert(
     if( (index < 0) || (index > BI_NBUFS(type)) )
         ERR( eBADBUFINDEX_BFM );
 
-   
+    hashValue = (key->pageNo + key->volNo) % HASHTABLESIZE(type);
+    insertIndex = BI_HASHTABLEENTRY(type, hashValue);
+
+    if(insertIndex != NIL)
+        BI_NEXTHASHENTRY(type, index) = BI_HASHTABLEENTRY(type, hashValue);
+
+    BI_HASHTABLEENTRY(type, hashValue) = index;
+    BI_NEXTHASHENTRY(type, index) = NIL
+    
 
     return( eNOERROR );
 
@@ -189,7 +198,23 @@ Four edubfm_DeleteAll(void)
     Two 	i;
     Four        tableSize;
     
+    for(Four type = 0; type < NUM_BUF_TYPES; type++)
+    {
+        tableSize = HASHTABLESIZE(type);
 
+        for(Four index = 0; index < tableSize; index++)
+        {
+            Two currentEntry, previousEntry = NIL;
+
+            currentEntry = BI_HASHTABLEENTRY(type, index);
+            while(currentEntry != NIL)
+            {
+                previousEntry = currentEntry;
+                currentEntry = BI_NEXTHASHENTRY(type, currentEntry);
+                BI_NEXTHASHENTRY(type, currentEntry) = NIL;
+            }
+        }
+    }
 
     return(eNOERROR);
 
