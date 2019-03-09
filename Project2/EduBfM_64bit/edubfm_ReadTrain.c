@@ -71,11 +71,17 @@ Four edubfm_ReadTrain(
 {
     Four e;			/* for error */
 
+    if(type == PAGE_BUF)
+    {
+        e = RDsM_ReadTrain(trainId, aTrain, 1);
+    }
+    else
+    {
+        e = RDsM_ReadTrain(trainId, aTrain, 4);
+    }
 
 	/* Error check whether using not supported functionality by EduBfM */
 	if (RM_IS_ROLLBACK_REQUIRED()) ERR(eNOTSUPPORTED_EDUBFM);
-
-
 
     return( eNOERROR );
 
