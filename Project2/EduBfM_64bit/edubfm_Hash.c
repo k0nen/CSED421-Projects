@@ -99,7 +99,7 @@ Four edubfm_Insert(
         BI_NEXTHASHENTRY(type, index) = BI_HASHTABLEENTRY(type, hashValue);
 
     BI_HASHTABLEENTRY(type, hashValue) = index;
-    BI_NEXTHASHENTRY(type, index) = NIL
+    BI_NEXTHASHENTRY(type, index) = NIL;
     
 
     return( eNOERROR );
@@ -170,7 +170,17 @@ Four edubfm_LookUp(
 
     CHECKKEY(key);    /*@ check validity of key */
 
+    hashValue = (key->pageNo + key->volNo) % HASHTABLESIZE(type);
 
+    i = BI_HASHTABLEENTRY(type, hashValue);
+
+    while(i != NIL)
+    {
+        if( EQUALKEY( &BI_KEY(type, i), key ) )
+            return i;
+        else
+            i = BI_NEXTHASHENTRY(type, i);
+    }
 
     return(NOTFOUND_IN_HTABLE);
     
