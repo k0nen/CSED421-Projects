@@ -66,7 +66,16 @@ Four EduBfM_FreeTrain(
     /*@ check if the parameter is valid. */
     if (IS_BAD_BUFFERTYPE(type)) ERR(eBADBUFFERTYPE_BFM);	
 
+    index = edubfm_LookUp(trainId, type);
 
+    if( index == NOTFOUND_IN_HTABLE )
+    {
+        ERR(eBADHASHKEY_BFM);
+    }
+    else if( BI_FIXED(type, index) > 0)
+    {
+        BI_FIXED(type, index) --;
+    }
     
     return( eNOERROR );
     
