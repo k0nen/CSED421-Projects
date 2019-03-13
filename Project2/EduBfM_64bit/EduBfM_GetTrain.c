@@ -83,8 +83,33 @@ Four EduBfM_GetTrain(
     /* Is the buffer type valid? */
     if(IS_BAD_BUFFERTYPE(type)) ERR(eBADBUFFERTYPE_BFM);	
 
+    index = edubfm_LookUp(trainId, type);
 
+    if( index == NOTFOUND_IN_HTABLE )
+    {
+        // Allocate an index in bufferPool
+        index = edubfm_AllocTrain(type);
 
+        // Read train from disk
+        e = edubfm_ReadTrain(
+            trainId,
+            BI_BUFFER(type, index),
+            type
+        );
+        if(e) ERR(e);
+
+        // Update bufferTable
+        BI_KEY(type, index) = trainId;
+        BI_FIXED(type, index) = 0;
+        BI_BITS(type, index) = 0;
+        BI_NEXTHASHENTRY(type, index) = NIL;
+    }
+    else
+    {
+        BI_FIXED(type, index) ++;
+    }
+    
+    *retBuf = BI_BUFFER(type, index);
     return(eNOERROR);   /* No error */
 
 }  /* EduBfM_GetTrain() */
