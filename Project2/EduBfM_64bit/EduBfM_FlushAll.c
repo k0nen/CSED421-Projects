@@ -66,10 +66,11 @@ Four EduBfM_FlushAll(void)
         {
             if( BI_BITS(type, i) & 0x80 )
             {
-                edubfm_FlushTrain(
+                e = edubfm_FlushTrain(
                     &BI_KEY(type, i),
                     type
                 );
+                if(e) ERR(e);
             }
         }
     }
