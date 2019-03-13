@@ -60,7 +60,19 @@ Four EduBfM_FlushAll(void)
     Two         i;                      /* index */
     Four        type;                   /* buffer type */
 
-    
+    for(type = 0; type < NUM_BUF_TYPES; type++)
+    {
+        for(i = 0; i < BI_NBUFS(type); i++)
+        {
+            if( BI_BITS(type, i) & 0x80 )
+            {
+                edubfm_FlushTrain(
+                    &BI_KEY(type, i),
+                    type
+                );
+            }
+        }
+    }
 
     return( eNOERROR );
     
