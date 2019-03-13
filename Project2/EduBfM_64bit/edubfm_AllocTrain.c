@@ -73,12 +73,56 @@ Four edubfm_AllocTrain(
 {
     Four 	e;			/* for error */
     Four 	victim;			/* return value */
+    Four    initialVictim;
     Four 	i;
     
 
 	/* Error check whether using not supported functionality by EduBfM */
 	if(sm_cfgParams.useBulkFlush) ERR(eNOTSUPPORTED_EDUBFM);
 
+    victim = BI_NEXTVICTIM(type);
+
+    while(1)
+    {
+        // Search only unfixed buffers
+        if( !BI_FIXED(type, victim) )
+        {
+            if( BI_BITS(type, victim) & 0x20 )
+            {
+                // Unset REFER bit
+                BI_BITS(type, victim) &= 0xDF;
+            }
+            else
+            {
+                // Found our victim!
+                // Flush if dirty bit is set
+                if( BI_BITS(type, victim) & 0x80 )
+                {
+                    edubfm_FlushTrain(
+                        &BI_KEY(type, victim),
+                        type
+                    );
+                }
+
+                // Replace and return
+                edubfm_Delete(
+                    &BI_KEY(type, victim),
+                    type
+                );
+                return victim;
+            }
+            
+        }
+
+        // Next victim
+        victim = (victim + 1) % BI_NBUFS(type);
+
+        if( initialVictim == victim )
+        {
+            // Every buffer is fixed, none to remove
+            ERR(eNOUNFIXEDBUF_BFM);
+        }
+    }
 
     
     return( victim );

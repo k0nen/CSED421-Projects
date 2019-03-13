@@ -135,7 +135,37 @@ Four edubfm_Delete(
 
     CHECKKEY(key);    /*@ check validity of key */
 
+    hashValue = (key->pageNo + key->volNo) % HASHTABLESIZE(type);
 
+    i = BI_HASHTABLEENTRY(type, hashValue);
+
+    if( EQUALKEY(key, &BI_KEY(type, i)) )
+    {
+        BI_HASHTABLEENTRY(type, hashValue) = NIL;
+        return (eNOERROR);
+    }
+    else
+    {
+        prev = BI_HASHTABLEENTRY(type, hashValue);
+        i = BI_NEXTHASHENTRY(type, prev);
+
+        while(i != NIL)
+        {
+            if( EQUALKEY(key, &BI_KEY(type, i)) )
+            {
+                BI_NEXTHASHENTRY(type, prev) = BI_NEXTHASHENTRY(type, i);
+                BI_NEXTHASHENTRY(type, i) = NIL;
+                return (eNOERROR);
+            }
+            else
+            {
+                prev = BI_NEXTHASHENTRY(type, prev);
+                i = BI_NEXTHASHENTRY(type, i);
+            }
+            
+        }
+    }
+    
 
     ERR( eNOTFOUND_BFM );
 
