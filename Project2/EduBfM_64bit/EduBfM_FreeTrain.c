@@ -76,6 +76,11 @@ Four EduBfM_FreeTrain(
     {
         BI_FIXED(type, index) --;
     }
+    else
+    {
+        printf("fixed counter is less than 0!!!\n");
+        printf("trainId = {%d,  %d}\n", trainId->volNo, trainId->pageNo);
+    }
     
     return( eNOERROR );
     

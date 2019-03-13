@@ -74,15 +74,19 @@ Four edubfm_ReadTrain(
 	/* Error check whether using not supported functionality by EduBfM */
 	if (RM_IS_ROLLBACK_REQUIRED()) ERR(eNOTSUPPORTED_EDUBFM);
 
-    if(type == PAGE_BUF)
-    {
+    switch(type) {
+    case PAGE_BUF:
         e = RDsM_ReadTrain(trainId, aTrain, 1);
-    }
-    else
-    {
+        break;
+    case LOT_LEAF_BUF:
         e = RDsM_ReadTrain(trainId, aTrain, 4);
+        break;
+    default:
+        ERR(eBADBUFFERTYPE_BFM);
+        break;
     }
 
+    if(e) ERR(e);
     return( eNOERROR );
 
 }  /* edubfm_ReadTrain */

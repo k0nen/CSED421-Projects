@@ -76,13 +76,25 @@ Four edubfm_FlushTrain(
     if (index < 0) ERR(eBADHASHKEY_BFM);
 
     bits = BI_BITS(type, index);
-    if(bits & 0x80)
+    if(bits & DIRTY)
     {
         // Write to disk if buffer is dirty
-        RDsM_WriteTrain(BI_BUFFER(type, index), trainId, type);
+        switch(type) {
+        case PAGE_BUF:
+            e = RDsM_WriteTrain(BI_BUFFER(type, index), trainId, 1);
+            break;
+        case LOT_LEAF_BUF:
+            e = RDsM_WriteTrain(BI_BUFFER(type, index), trainId, 4);
+            break;
+        default:
+            ERR(eBADBUFFERTYPE_BFM);
+            break;
+        }
+
+        if(e) ERR(e);
 
         // Unset dirty bit
-        BI_BITS(type, index) &= 0x7F;
+        BI_BITS(type, index) ^= DIRTY;
     }
 	
     return( eNOERROR );

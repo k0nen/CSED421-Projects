@@ -78,7 +78,7 @@ Four EduBfM_SetDirty(
     }
     else
     {
-        BI_BITS(type, index) |= 0x80;
+        BI_BITS(type, index) |= DIRTY;
     }
     
 

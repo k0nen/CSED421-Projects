@@ -1,4 +1,5 @@
-*.o
+./*.o
+./*.vol
 ./EduBfM_Test
-./Output/*
+./Output/
 ./odysseus_error.log

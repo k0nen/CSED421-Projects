@@ -99,9 +99,10 @@ Four EduBfM_GetTrain(
         if(e) ERR(e);
 
         // Update bufferTable
-        BI_KEY(type, index) = trainId;
-        BI_FIXED(type, index) = 0;
-        BI_BITS(type, index) = 0;
+        BI_KEY(type, index).pageNo = trainId->pageNo;
+        BI_KEY(type, index).volNo = trainId->volNo;
+        BI_FIXED(type, index) = 1;
+        BI_BITS(type, index) = ALL_0;
         BI_NEXTHASHENTRY(type, index) = NIL;
     }
     else

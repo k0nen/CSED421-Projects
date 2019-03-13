@@ -244,15 +244,12 @@ Four edubfm_DeleteAll(void)
 
         for(Four index = 0; index < tableSize; index++)
         {
-            Two currentEntry, previousEntry = NIL;
+            Two currentEntry, nextEntry = NIL;
 
             currentEntry = BI_HASHTABLEENTRY(type, index);
-            while(currentEntry != NIL)
-            {
-                previousEntry = currentEntry;
-                currentEntry = BI_NEXTHASHENTRY(type, currentEntry);
-                BI_NEXTHASHENTRY(type, currentEntry) = NIL;
-            }
+
+            // Erase hash table
+            BI_HASHTABLEENTRY(type, index) = NIL;
         }
     }
 

@@ -87,16 +87,16 @@ Four edubfm_AllocTrain(
         // Search only unfixed buffers
         if( !BI_FIXED(type, victim) )
         {
-            if( BI_BITS(type, victim) & 0x20 )
+            if( BI_BITS(type, victim) & REFER )
             {
                 // Unset REFER bit
-                BI_BITS(type, victim) &= 0xDF;
+                BI_BITS(type, victim) ^= REFER;
             }
             else
             {
                 // Found our victim!
                 // Flush if dirty bit is set
-                if( BI_BITS(type, victim) & 0x80 )
+                if( BI_BITS(type, victim) & DIRTY )
                 {
                     edubfm_FlushTrain(
                         &BI_KEY(type, victim),

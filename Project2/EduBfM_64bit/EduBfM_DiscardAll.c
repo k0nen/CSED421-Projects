@@ -65,11 +65,11 @@ Four EduBfM_DiscardAll(void)
         {
             SET_NILBFMHASHKEY( BI_KEY(type, i) );
             BI_FIXED(type, i) = 0;
-            BI_BITS(type, i) = 0;
+            BI_BITS(type, i) = ALL_0;
         }
     }
 
-    dubfm_DeleteAll();
+    edubfm_DeleteAll();
 
     return(eNOERROR);
 
