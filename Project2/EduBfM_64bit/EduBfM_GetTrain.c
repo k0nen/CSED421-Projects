@@ -102,8 +102,15 @@ Four EduBfM_GetTrain(
         BI_KEY(type, index).pageNo = trainId->pageNo;
         BI_KEY(type, index).volNo = trainId->volNo;
         BI_FIXED(type, index) = 1;
-        BI_BITS(type, index) = ALL_0;
+        BI_BITS(type, index) = REFER;
         BI_NEXTHASHENTRY(type, index) = NIL;
+
+        // Update hash table
+        edubfm_Insert(
+            &BI_KEY(type, index),
+            index,
+            type
+        );
     }
     else
     {

@@ -112,7 +112,7 @@ Four EduBfM_Test(Four volId)
 	for (i = 0; i < NUM_PAGE_BUFS; i++)
 	{
 		/* The successful default solution code is called if "Edu" is omitted from the function name in the following line */
-		e = BfM_GetTrain(&pageID[i], (char **)&apage, PAGE_BUF);
+		e = EduBfM_GetTrain(&pageID[i], (char **)&apage, PAGE_BUF);
 		if (e < eNOERROR) ERR(e);
 		printf("pageNo %d is inserted into buffer using GetTrain()\n", pageID[i].pageNo);
 	}
@@ -133,7 +133,7 @@ Four EduBfM_Test(Four volId)
 	for (i = 0; i < NUM_PAGE_BUFS; i = i + 2)
 	{
 		/* The successful default solution code is called if "Edu" is omitted from the function name in the following line */
-		e = BfM_GetTrain(&pageID[i], (char **)&apage, PAGE_BUF);
+		e = EduBfM_GetTrain(&pageID[i], (char **)&apage, PAGE_BUF);
 		if (e < eNOERROR) ERR(e);
 		printf("pageNo %d is inserted into buffer using GetTrain()\n", pageID[i].pageNo);
 	}
@@ -199,7 +199,7 @@ Four EduBfM_Test(Four volId)
 	printf("->Insert a new page which has page number makes collision in hash function \n\n");
 	
 	/* The successful default solution code is called if "Edu" is omitted from the function name in the following line */
-	e = BfM_GetTrain(&pageID[LAST_PAGE_NUM], (char **)&apage, PAGE_BUF);
+	e = EduBfM_GetTrain(&pageID[LAST_PAGE_NUM], (char **)&apage, PAGE_BUF);
 	if (e < eNOERROR) ERR(e);
 	printf("pageNo %d is inserted into buffer using GetTrain()\n", pageID[LAST_PAGE_NUM].pageNo);  
 	
@@ -221,7 +221,7 @@ Four EduBfM_Test(Four volId)
 	for ( i = NUM_PAGE_BUFS; i < PAGE_BUFS_CLOCKALG ; i++)
 	{
 		/* The successful default solution code is called if "Edu" is omitted from the function name in the following line */
-		 e = BfM_GetTrain(&pageID[i], (char **)&apage, PAGE_BUF);
+		 e = EduBfM_GetTrain(&pageID[i], (char **)&apage, PAGE_BUF);
          if (e < eNOERROR) ERR(e);
 		 printf("pageNo %d is inserted into buffer using GetTrain()\n", pageID[i].pageNo);
 
@@ -253,7 +253,7 @@ Four EduBfM_Test(Four volId)
 	for (i = 0; i < NUM_PAGE_BUFS; i = i + 2)
 	{
 		/* The successful default solution code is called if "Edu" is omitted from the function name in the following line */
-		e = BfM_GetTrain(&pageID[i], (char **)&apage, PAGE_BUF);
+		e = EduBfM_GetTrain(&pageID[i], (char **)&apage, PAGE_BUF);
 		if (e < eNOERROR) ERR(e);
 		
 		apage->header.flags = i+1;
@@ -352,7 +352,7 @@ Four EduBfM_Test(Four volId)
 	for (i = 0; i < NUM_PAGE_BUFS; i = i + 2)
 	{
 		/* The successful default solution code is called if "Edu" is omitted from the function name in the following line */
-		e = BfM_GetTrain(&pageID[i], (char **)&apage, PAGE_BUF);
+		e = EduBfM_GetTrain(&pageID[i], (char **)&apage, PAGE_BUF);
 		if (e < eNOERROR) ERR(e);
 		printf("The header flags value of flushed pageNo %d is %d\n", pageID[i].pageNo, apage->header.flags);
 		/* The successful default solution code is called if "Edu" is omitted from the function name in the following line */

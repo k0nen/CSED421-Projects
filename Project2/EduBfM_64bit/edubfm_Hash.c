@@ -99,7 +99,6 @@ Four edubfm_Insert(
         BI_NEXTHASHENTRY(type, index) = BI_HASHTABLEENTRY(type, hashValue);
 
     BI_HASHTABLEENTRY(type, hashValue) = index;
-    BI_NEXTHASHENTRY(type, index) = NIL;
     
 
     return( eNOERROR );
