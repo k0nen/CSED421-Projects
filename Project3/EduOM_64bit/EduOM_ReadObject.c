@@ -110,7 +110,7 @@ Four EduOM_ReadObject(
 
     MAKE_PAGEID(pid, oid->volNo, oid->pageNo);
     e = BfM_GetTrain(&pid, &apage, PAGE_BUF);
-    if(e < 0) ERR(e);
+    if(e) ERR(e);
 
     if(!IS_VALID_OBJECTID(oid, apage)) ERRB1(eBADOBJECTID_OM, &pid, PAGE_BUF);
 
