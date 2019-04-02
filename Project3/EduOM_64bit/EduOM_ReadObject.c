@@ -99,7 +99,6 @@ Four EduOM_ReadObject(
     Four	offset;		/* offset of the object in the page */
 
     
-    
     /*@ check parameters */
 
     if (oid == NULL) ERR(eBADOBJECTID_OM);
@@ -108,7 +107,36 @@ Four EduOM_ReadObject(
     
     if (buf == NULL) ERR(eBADUSERBUF_OM);
 
-    
+
+    MAKE_PAGEID(pid, oid->volNo, oid->pageNo);
+    e = BfM_GetTrain(&pid, &apage, PAGE_BUF);
+    if(e < 0) ERR(e);
+
+    if(!IS_VALID_OBJECTID(oid, apage)) ERRB1(eBADOBJECTID_OM, &pid, PAGE_BUF);
+
+
+    offset = apage->slot[-(oid->slotNo)].offset;
+    obj = &(apage->data[offset]);
+
+    if(length == REMAINDER || start + length > obj->header.length) {
+        memcpy(
+            buf,
+            &(obj->data[start]),
+            obj->header.length - start
+        );
+
+        BfM_FreeTrain(apage, PAGE_BUF);
+        return obj->header.length - start;
+    }
+    else {
+        memcpy(
+            buf,
+            &(obj->data[start]),
+            length
+        );
+
+        BfM_FreeTrain(apage, PAGE_BUF);
+    }
 
     return(length);
     

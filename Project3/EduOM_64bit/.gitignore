@@ -1,3 +1,5 @@
 Output/
 odysseus_error.log
 *.vol
+.vscode/
+./EduOM_Test

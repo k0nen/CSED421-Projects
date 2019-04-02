@@ -58,8 +58,8 @@ char* itoa(Four val, Four base);
  *  composed of object header, slot, and data.
  *  There are five operations in EduOM.
  *  EduOM_Test() test these below operations in EduOM.
- *  EduOM_CreateObject(), EduOM_DestroyObject(), EduOM_ReadObject(),
- *  EduOM_PrevObject(), EduOM_NextObject().
+ *  OM_CreateObject(), OM_DestroyObject(), EduOM_ReadObject(),
+ *  OM_PrevObject(), OM_NextObject().
  *
  *
  * Returns:
@@ -89,14 +89,14 @@ Four EduOM_Test(Four volId, Four handle){
 	e = sm_GetCatalogEntryFromDataFileId(ARRAYINDEX, &fid, &catalogEntry);
 	if (e < eNOERROR) ERR(e);
 
-	/* #1 Start the test for EduOM_CreateObject */
-	printf("****************************** TEST#1, EduOM_CreateObject and EduOM_DestroyObject ******************************\n");
-	/* Test for EduOM_CreateObject() when a near object is NULL */
-	printf("*Test 1_1 : Test for EduOM_CreateObject() when a near object is NULL\n");
+	/* #1 Start the test for OM_CreateObject */
+	printf("****************************** TEST#1, OM_CreateObject and OM_DestroyObject ******************************\n");
+	/* Test for OM_CreateObject() when a near object is NULL */
+	printf("*Test 1_1 : Test for OM_CreateObject() when a near object is NULL\n");
 	printf("->Insert a new object into a empty page\n\n");
 	strcat(omTestObjectNo, "0");
 	/* The successful default solution code is called if "Edu" is omitted from the function name in the following line */
-	e = EduOM_CreateObject(&catalogEntry, NULL, NULL, strlen(omTestObjectNo), omTestObjectNo , &oid);
+	e = OM_CreateObject(&catalogEntry, NULL, NULL, strlen(omTestObjectNo), omTestObjectNo , &oid);
 	if (e < eNOERROR) ERR(e);
 	printf("The object ( %d, %d )  is inserted into the page\n", oid.pageNo, oid.slotNo);
     firstOid = oid;
@@ -107,7 +107,7 @@ Four EduOM_Test(Four volId, Four handle){
 	printf("\n\n");
 
 	/* Test for EduOM_CreateObjecT() when a near object is not NULL */
-	printf("*Test 1_2 : Test for EduOM_CreateObject() when a near object is not NULL\n");
+	printf("*Test 1_2 : Test for OM_CreateObject() when a near object is not NULL\n");
 	printf("->Insert new objects into the page until the page is full\n\n");
 
 	if (e < eNOERROR) ERR(e);
@@ -115,7 +115,7 @@ Four EduOM_Test(Four volId, Four handle){
 		strcpy(omTestObjectNo, "EduOM_TestModule_OBJECT_NUM_");
 		strcat(omTestObjectNo, itoa(i,10));	
 		/* The successful default solution code is called if "Edu" is omitted from the function name in the following line */
-		e = EduOM_CreateObject(&catalogEntry, &oid, NULL, strlen(omTestObjectNo), omTestObjectNo, &oid);
+		e = OM_CreateObject(&catalogEntry, &oid, NULL, strlen(omTestObjectNo), omTestObjectNo, &oid);
 		if(e < eNOERROR) ERR(e);		  
 		printf("The object ( %d, %d )  is inserted into the page\n", oid.pageNo, oid.slotNo);
 	}
@@ -135,7 +135,7 @@ Four EduOM_Test(Four volId, Four handle){
         strcpy(omTestObjectNo, "EduOM_TestModule_OBJECT_NUM_");
 		strcat(omTestObjectNo, itoa(i,10));
 		/* The successful default solution code is called if "Edu" is omitted from the function name in the following line */
-		e = EduOM_CreateObject(&catalogEntry, &oid, NULL, strlen(omTestObjectNo), omTestObjectNo, &oid);
+		e = OM_CreateObject(&catalogEntry, &oid, NULL, strlen(omTestObjectNo), omTestObjectNo, &oid);
 		if (e < eNOERROR) ERR(e);
 		printf("The object ( %d, %d )  is inserted into the page\n", oid.pageNo, oid.slotNo);
 	}
@@ -148,8 +148,8 @@ Four EduOM_Test(Four volId, Four handle){
     printf("\n---------------------------------- Result ----------------------------------\n");
 	eduom_DumpAllPage(&dumpPage);
 	
-	/* Test for EduOM_DestroyObject() when destroying object is not last object in the page */
-	printf("*Test 1_4 : Test for EduOM_DestroyObject() when destroying object is not last object in the page\n");
+	/* Test for OM_DestroyObject() when destroying object is not last object in the page */
+	printf("*Test 1_4 : Test for OM_DestroyObject() when destroying object is not last object in the page\n");
 	printf("->Destroy ten objects from the page.\n\n");
 	oid = firstOid;
 	for (i = 0; i < 10; i++)
@@ -157,7 +157,7 @@ Four EduOM_Test(Four volId, Four handle){
 		oid.slotNo += 2;
 		oid.unique += 2;
 		/* The successful default solution code is called if "Edu" is omitted from the function name in the following line */
-		EduOM_DestroyObject(&catalogEntry, &oid, &dlPool, &dlHead);
+		OM_DestroyObject(&catalogEntry, &oid, &dlPool, &dlHead);
 		printf("The object ( %d, %d )  is destroyed from the page\n", oid.pageNo, oid.slotNo);
 	}
 
@@ -169,13 +169,13 @@ Four EduOM_Test(Four volId, Four handle){
 	 printf("\n---------------------------------- Result ----------------------------------\n");
 	 eduom_DumpOnePage(&dumpPage);
 
-	/*  Test for EduOM_CreateObject() when needing page compact */
-	printf("*Test 1_5 : Test for EduOM_CreateObject() when needing page compact\n");
+	/*  Test for OM_CreateObject() when needing page compact */
+	printf("*Test 1_5 : Test for OM_CreateObject() when needing page compact\n");
 	printf("->Insert a new object into the page which needs page compact\n\n");
 	oid = firstOid;
 	strcpy(omTestObjectNo, "EduOM_OBJECT_FOR_COMPACT_TEST");
 	/* The successful default solution code is called if "Edu" is omitted from the function name in the following line */
-	e = EduOM_CreateObject(&catalogEntry, &oid, NULL, strlen(omTestObjectNo), omTestObjectNo, &oid);
+	e = OM_CreateObject(&catalogEntry, &oid, NULL, strlen(omTestObjectNo), omTestObjectNo, &oid);
 	if (e < eNOERROR) ERR(e);
 	printf("The object ( %d, %d )  is inserted into the page\n", oid.pageNo, oid.slotNo);
 
@@ -187,12 +187,12 @@ Four EduOM_Test(Four volId, Four handle){
 	printf("\n---------------------------------- Result ----------------------------------\n");
 	eduom_DumpOnePage(&dumpPage);
 
-	/* Test for EduOM_DestroyObject() when the object is last object in the page */
-	printf("*Test 1_6 : Test for EduOM_DestroyObject() when the object is last object in the page\n");
+	/* Test for OM_DestroyObject() when the object is last object in the page */
+	printf("*Test 1_6 : Test for OM_DestroyObject() when the object is last object in the page\n");
 	printf("->Destroy the last object form the 3rd page\n\n");
 	
 	/* The successful default solution code is called if "Edu" is omitted from the function name in the following line */
-	e = EduOM_DestroyObject(&catalogEntry, &lastOid, &dlPool, &dlHead);
+	e = OM_DestroyObject(&catalogEntry, &lastOid, &dlPool, &dlHead);
 	if (e < eNOERROR) ERR(e);
 	printf("The object ( %d, %d )  is destroyed from the page\n", lastOid.pageNo, lastOid.slotNo);
 
@@ -210,14 +210,14 @@ Four EduOM_Test(Four volId, Four handle){
 	getchar();          
 	printf("\n\n");
 
-	/* Test 1_7 : Test for EduOM_DestroyObject() when the object is unique object in the page */
-	printf("*Test 1_7 : Test for EduOM_DestroyObject() when the object is unique object in the page\n");
+	/* Test 1_7 : Test for OM_DestroyObject() when the object is unique object in the page */
+	printf("*Test 1_7 : Test for OM_DestroyObject() when the object is unique object in the page\n");
 	printf("->Destroy objects until destroying object is last object form the 3rd page\n\n");
 
 	
 	do{
 		/* The successful default solution code is called if "Edu" is omitted from the function name in the following line */
-		e = EduOM_DestroyObject(&catalogEntry, &lastOid, &dlPool, &dlHead);
+		e = OM_DestroyObject(&catalogEntry, &lastOid, &dlPool, &dlHead);
 		if (e < eNOERROR) ERR(e);
 		
 		printf("The object ( %d, %d )  is destroyed from the page\n", lastOid.pageNo, lastOid.slotNo);
@@ -239,7 +239,7 @@ Four EduOM_Test(Four volId, Four handle){
 
 	
 
-	printf("****************************** TEST#1, EduOM_CreateObject and EduOM_DestroyObject  ******************************\n");
+	printf("****************************** TEST#1, OM_CreateObject and OM_DestroyObject  ******************************\n");
 /* #1 End the test */
 
 
@@ -280,13 +280,13 @@ Four EduOM_Test(Four volId, Four handle){
 	printf("****************************** TEST#2, EduOM_ReadObject. ******************************\n");
 /* #2 End the test */
 
-/* #3 Start the test for EduOM_PrevObject */
-    printf("****************************** TEST#3, EduOM_PrevObject. ******************************\n");
-	/* Test for EduOM_PrevObject() when parameter curOID is NULL */
-	printf("*Test 3_1 : Test for EduOM_PrevObject() when parameter curOID is NULL.\n");
+/* #3 Start the test for OM_PrevObject */
+    printf("****************************** TEST#3, OM_PrevObject. ******************************\n");
+	/* Test for OM_PrevObject() when parameter curOID is NULL */
+	printf("*Test 3_1 : Test for OM_PrevObject() when parameter curOID is NULL.\n");
 	printf("->Get a last object identifier\n\n");
 	/* The successful default solution code is called if "Edu" is omitted from the function name in the following line */
-	e = EduOM_PrevObject(&catalogEntry, NULL, &oid, NULL);
+	e = OM_PrevObject(&catalogEntry, NULL, &oid, NULL);
 	if (e < eNOERROR) ERR(e);
 	printf("Press enter key to continue...");
 	getchar();
@@ -306,14 +306,14 @@ Four EduOM_Test(Four volId, Four handle){
 	getchar();
 	printf("\n\n");
 
-	/* Test for EduOM_PrevObject() when parameter curOID is not NULL */
-	printf("*Test 3_2 : Test for EduOM_PrevObject() when parameter curOID is not NULL.\n");
+	/* Test for OM_PrevObject() when parameter curOID is not NULL */
+	printf("*Test 3_2 : Test for OM_PrevObject() when parameter curOID is not NULL.\n");
 	printf("->Get a identifier of previous object of a last object\n\n");
 	printf("Press enter key to continue...");       
 	getchar();      
 	printf("\n\n");
 	/* The successful default solution code is called if "Edu" is omitted from the function name in the following line */
-	e = EduOM_PrevObject(&catalogEntry, &oid, &oid, NULL);
+	e = OM_PrevObject(&catalogEntry, &oid, &oid, NULL);
 	if (e < eNOERROR) ERR(e);
 	printf("---------------------------------- Result ----------------------------------\n");
 
@@ -338,11 +338,11 @@ Four EduOM_Test(Four volId, Four handle){
 	do
 	{
 		/* The successful default solution code is called if "Edu" is omitted from the function name in the following line */
-		e = EduOM_PrevObject(&catalogEntry, &oid, &oid, NULL);
+		e = OM_PrevObject(&catalogEntry, &oid, &oid, NULL);
 		if (e < eNOERROR) ERR(e);
 	}while(oid.slotNo != 0);
 	/* The successful default solution code is called if "Edu" is omitted from the function name in the following line */
-	e = EduOM_PrevObject(&catalogEntry, &oid, &oid, NULL);
+	e = OM_PrevObject(&catalogEntry, &oid, &oid, NULL);
 	if (e < eNOERROR) ERR(e);
 	printf("---------------------------------- Result ----------------------------------\n");
 	
@@ -359,20 +359,20 @@ Four EduOM_Test(Four volId, Four handle){
 	getchar();
 	printf("\n\n");
 	
-	printf("****************************** TEST#3, EduOM_PrevObject. ******************************\n");
+	printf("****************************** TEST#3, OM_PrevObject. ******************************\n");
 /* #4 End the test */
 
-/* #5 Start the test for EduOM_NextObject */
-	printf("****************************** TEST#4, EduOM_NextObject. ******************************\n");
-	/* Test for EduOM_NextObject() when parameter curOID is NULL */
-	printf("*Test 4_1 : Test for EduOM_NextObject() when parameter curOID is NULL.\n");
+/* #5 Start the test for OM_NextObject */
+	printf("****************************** TEST#4, OM_NextObject. ******************************\n");
+	/* Test for OM_NextObject() when parameter curOID is NULL */
+	printf("*Test 4_1 : Test for OM_NextObject() when parameter curOID is NULL.\n");
     printf("->Get a first object identifier\n\n");
 	printf("Press enter key to continue...");
 	getchar();
 	printf("\n\n");
 
 	/* The successful default solution code is called if "Edu" is omitted from the function name in the following line */
-	e = EduOM_NextObject(&catalogEntry, NULL, &oid, NULL);
+	e = OM_NextObject(&catalogEntry, NULL, &oid, NULL);
 	if (e < eNOERROR) ERR(e);
 
 	printf("---------------------------------- Result ----------------------------------\n");
@@ -390,15 +390,15 @@ Four EduOM_Test(Four volId, Four handle){
 	getchar();
 	printf("\n\n");
 	
-	/* Test for EduOM_NextObject() when parameter curOID is not NULL */
-	printf("*Test 4_2 : Test for EduOM_NextObject() when parameter curOID is not NULL.\n");
+	/* Test for OM_NextObject() when parameter curOID is not NULL */
+	printf("*Test 4_2 : Test for OM_NextObject() when parameter curOID is not NULL.\n");
 	printf("->Get a identifier of next object of a first object\n\n");
 	printf("Press enter key to continue...");
 	getchar();
 	printf("\n\n");
 
 	/* The successful default solution code is called if "Edu" is omitted from the function name in the following line */
-    e = EduOM_NextObject(&catalogEntry, &oid, &oid, NULL);
+    e = OM_NextObject(&catalogEntry, &oid, &oid, NULL);
 	if (e < eNOERROR) ERR(e);
 	printf("---------------------------------- Result ----------------------------------\n");
 
@@ -424,7 +424,7 @@ Four EduOM_Test(Four volId, Four handle){
 	do
 	{
 		/* The successful default solution code is called if "Edu" is omitted from the function name in the following line */
-		e = EduOM_NextObject(&catalogEntry, &oid, &oid, NULL);
+		e = OM_NextObject(&catalogEntry, &oid, &oid, NULL);
 		if (e < eNOERROR) ERR(e);
 	}while(oid.slotNo != 0);
 	printf("---------------------------------- Result ----------------------------------\n");
@@ -441,7 +441,7 @@ Four EduOM_Test(Four volId, Four handle){
 	printf("Press enter key to continue...");
 	getchar();
 	printf("\n\n");
-	printf("****************************** TEST#4, EduOM_NextObject. ******************************\n");
+	printf("****************************** TEST#4, OM_NextObject. ******************************\n");
 
 	
 	/* Destroy File */
