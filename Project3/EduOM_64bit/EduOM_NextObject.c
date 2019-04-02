@@ -82,7 +82,6 @@ Four EduOM_NextObject(
     sm_CatOverlayForData *catEntry; /* data structure for catalog object access */
 
 
-
     /*@
      * parameter checking
      */
@@ -90,7 +89,95 @@ Four EduOM_NextObject(
     
     if (nextOID == NULL) ERR(eBADOBJECTID_OM);
 
+    MAKE_PHYSICALFILEID(pFid, catObjForFile->volNo, catObjForFile->pageNo);
+    e = BfM_GetTrain(&pFid, &catPage, PAGE_BUF);
+    if(e) ERR(e);
+    GET_PTR_TO_CATENTRY_FOR_DATA(catObjForFile, catPage, catEntry);
 
+    // If curOID is NULL, then return the first object of file
+    if(curOID == NULL) {
+        pageNo = catEntry->firstPage;
+        MAKE_PAGEID(pid, catObjForFile->volNo, pageNo);
+        e = BfM_GetTrain(&pid, &apage, PAGE_BUF);
+        if(e) ERR(e);
+        offset = apage->slot[0].offset;
+        obj = &(apage->data[offset]);
+        
+        MAKE_OBJECTID(
+            *nextOID,
+            apage->header.pid.volNo,
+            apage->header.pid.pageNo,
+            0,
+            apage->slot[0].unique
+        );
+
+        e = BfM_FreeTrain(catObjForFile, PAGE_BUF);
+        if(e) ERR(e);
+        e = BfM_FreeTrain(&pid, PAGE_BUF);
+        if(e) ERR(e);
+        return(eNOERROR);
+    }
+    else {
+        MAKE_PAGEID(pid, curOID->volNo, curOID->pageNo);
+        BfM_GetTrain(&pid, &apage, PAGE_BUF);
+        if(e) ERR(e);
+
+        i = curOID->slotNo;
+
+        if(i + 1 < apage->header.nSlots) {
+
+            offset = apage->slot[-i-1].offset;
+            obj = &(apage->data[offset]);
+            
+            MAKE_OBJECTID(
+                *nextOID,
+                apage->header.pid.volNo,
+                apage->header.pid.pageNo,
+                i + 1,
+                apage->slot[-i-1].unique
+            );
+
+            e = BfM_FreeTrain(catObjForFile, PAGE_BUF);
+            if(e) ERR(e);
+            e = BfM_FreeTrain(&pid, PAGE_BUF);
+            if(e) ERR(e);
+
+            return(eNOERROR);
+        }
+        else if(apage->header.nextPage != NIL) {
+
+            pageNo = apage->header.nextPage;
+
+            e = BfM_FreeTrain(&pid, PAGE_BUF);
+            if(e) ERR(e);
+            
+            MAKE_PAGEID(pid, curOID->volNo, pageNo);
+            BfM_GetTrain(&pid, &apage, PAGE_BUF);
+            if(e) ERR(e);
+
+            MAKE_OBJECTID(
+                *nextOID,
+                apage->header.pid.volNo,
+                apage->header.pid.pageNo,
+                0,
+                apage->slot[0].unique
+            );
+
+            e = BfM_FreeTrain(catObjForFile, PAGE_BUF);
+            if(e) ERR(e);
+            e = BfM_FreeTrain(&pid, PAGE_BUF);
+            if(e) ERR(e);
+
+            return(eNOERROR);
+        }
+        else {
+            e = BfM_FreeTrain(catObjForFile, PAGE_BUF);
+            if(e) ERR(e);
+            e = BfM_FreeTrain(&pid, PAGE_BUF);
+            if(e) ERR(e);
+        }
+
+    }
 
     return(EOS);		/* end of scan */
     
