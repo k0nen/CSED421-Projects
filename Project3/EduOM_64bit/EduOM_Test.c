@@ -59,7 +59,7 @@ char* itoa(Four val, Four base);
  *  There are five operations in EduOM.
  *  EduOM_Test() test these below operations in EduOM.
  *  OM_CreateObject(), OM_DestroyObject(), EduOM_ReadObject(),
- *  OM_PrevObject(), EduOM_NextObject().
+ *  EduOM_PrevObject(), EduOM_NextObject().
  *
  *
  * Returns:
@@ -280,13 +280,13 @@ Four EduOM_Test(Four volId, Four handle){
 	printf("****************************** TEST#2, EduOM_ReadObject. ******************************\n");
 /* #2 End the test */
 
-/* #3 Start the test for OM_PrevObject */
-    printf("****************************** TEST#3, OM_PrevObject. ******************************\n");
-	/* Test for OM_PrevObject() when parameter curOID is NULL */
-	printf("*Test 3_1 : Test for OM_PrevObject() when parameter curOID is NULL.\n");
+/* #3 Start the test for EduOM_PrevObject */
+    printf("****************************** TEST#3, EduOM_PrevObject. ******************************\n");
+	/* Test for EduOM_PrevObject() when parameter curOID is NULL */
+	printf("*Test 3_1 : Test for EduOM_PrevObject() when parameter curOID is NULL.\n");
 	printf("->Get a last object identifier\n\n");
 	/* The successful default solution code is called if "Edu" is omitted from the function name in the following line */
-	e = OM_PrevObject(&catalogEntry, NULL, &oid, NULL);
+	e = EduOM_PrevObject(&catalogEntry, NULL, &oid, NULL);
 	if (e < eNOERROR) ERR(e);
 	printf("Press enter key to continue...");
 	getchar();
@@ -306,14 +306,14 @@ Four EduOM_Test(Four volId, Four handle){
 	getchar();
 	printf("\n\n");
 
-	/* Test for OM_PrevObject() when parameter curOID is not NULL */
-	printf("*Test 3_2 : Test for OM_PrevObject() when parameter curOID is not NULL.\n");
+	/* Test for EduOM_PrevObject() when parameter curOID is not NULL */
+	printf("*Test 3_2 : Test for EduOM_PrevObject() when parameter curOID is not NULL.\n");
 	printf("->Get a identifier of previous object of a last object\n\n");
 	printf("Press enter key to continue...");       
 	getchar();      
 	printf("\n\n");
 	/* The successful default solution code is called if "Edu" is omitted from the function name in the following line */
-	e = OM_PrevObject(&catalogEntry, &oid, &oid, NULL);
+	e = EduOM_PrevObject(&catalogEntry, &oid, &oid, NULL);
 	if (e < eNOERROR) ERR(e);
 	printf("---------------------------------- Result ----------------------------------\n");
 
@@ -338,11 +338,11 @@ Four EduOM_Test(Four volId, Four handle){
 	do
 	{
 		/* The successful default solution code is called if "Edu" is omitted from the function name in the following line */
-		e = OM_PrevObject(&catalogEntry, &oid, &oid, NULL);
+		e = EduOM_PrevObject(&catalogEntry, &oid, &oid, NULL);
 		if (e < eNOERROR) ERR(e);
 	}while(oid.slotNo != 0);
 	/* The successful default solution code is called if "Edu" is omitted from the function name in the following line */
-	e = OM_PrevObject(&catalogEntry, &oid, &oid, NULL);
+	e = EduOM_PrevObject(&catalogEntry, &oid, &oid, NULL);
 	if (e < eNOERROR) ERR(e);
 	printf("---------------------------------- Result ----------------------------------\n");
 	
@@ -359,7 +359,7 @@ Four EduOM_Test(Four volId, Four handle){
 	getchar();
 	printf("\n\n");
 	
-	printf("****************************** TEST#3, OM_PrevObject. ******************************\n");
+	printf("****************************** TEST#3, EduOM_PrevObject. ******************************\n");
 /* #4 End the test */
 
 /* #5 Start the test for EduOM_NextObject */

@@ -77,6 +77,7 @@ Four EduOM_PrevObject(
     PageNo pageNo;		/* a temporary var for previous page's PageNo */
     SlottedPage *apage;		/* a pointer to the data page */
     Object *obj;		/* a pointer to the Object */
+    PhysicalFileID pFid;	/* file in which the objects are located */
     SlottedPage *catPage;	/* buffer page containing the catalog object */
     sm_CatOverlayForData *catEntry; /* overlay structure for catalog object access */
 
@@ -87,7 +88,105 @@ Four EduOM_PrevObject(
     
     if (prevOID == NULL) ERR(eBADOBJECTID_OM);
 
-    
+    MAKE_PHYSICALFILEID(pFid, catObjForFile->volNo, catObjForFile->pageNo);
+    e = BfM_GetTrain(&pFid, &catPage, PAGE_BUF);
+    if(e) ERR(e);
+    GET_PTR_TO_CATENTRY_FOR_DATA(catObjForFile, catPage, catEntry);
+
+    // If curOID is NULL, then return the last object of file
+    if(curOID == NULL) {
+        pageNo = catEntry->lastPage;
+        MAKE_PAGEID(pid, catObjForFile->volNo, pageNo);
+        e = BfM_GetTrain(&pid, &apage, PAGE_BUF);
+        if(e) ERR(e);
+
+        i = apage->header.nSlots;
+        offset = apage->slot[-i+1].offset;
+        obj = &(apage->data[offset]);
+
+        MAKE_OBJECTID(
+            *prevOID,
+            apage->header.pid.volNo,
+            apage->header.pid.pageNo,
+            i - 1,
+            apage->slot[-i+1].unique
+        );
+        if(objHdr != NULL) {
+            *objHdr = obj->header;
+        }
+
+        e = BfM_FreeTrain(catObjForFile, PAGE_BUF);
+        if(e) ERR(e);
+        e = BfM_FreeTrain(&pid, PAGE_BUF);
+        if(e) ERR(e);
+        return(eNOERROR);
+    }
+    else {
+        MAKE_PAGEID(pid, curOID->volNo, curOID->pageNo);
+        BfM_GetTrain(&pid, &apage, PAGE_BUF);
+        if(e) ERR(e);
+
+        i = curOID->slotNo;
+
+        if(i > 0) {
+            offset = apage->slot[-i+1].offset;
+            obj = &(apage->data[offset]);
+
+            MAKE_OBJECTID(
+                *prevOID,
+                apage->header.pid.volNo,
+                apage->header.pid.pageNo,
+                i - 1,
+                apage->slot[-i+1].unique
+            );
+            if(objHdr != NULL) {
+                *objHdr = obj->header;
+            }
+
+            e = BfM_FreeTrain(catObjForFile, PAGE_BUF);
+            if(e) ERR(e);
+            e = BfM_FreeTrain(&pid, PAGE_BUF);
+            if(e) ERR(e);
+
+            return(eNOERROR);
+        }
+        else if(apage->header.prevPage != NIL) {
+            pageNo = apage->header.prevPage;
+
+            e = BfM_FreeTrain(&pid, PAGE_BUF);
+            if(e) ERR(e);
+            
+            MAKE_PAGEID(pid, curOID->volNo, pageNo);
+            BfM_GetTrain(&pid, &apage, PAGE_BUF);
+            if(e) ERR(e);
+
+            i = apage->header.nSlots - 1;
+
+            MAKE_OBJECTID(
+                *prevOID,
+                apage->header.pid.volNo,
+                apage->header.pid.pageNo,
+                i,
+                apage->slot[-i].unique
+            );
+            if(objHdr != NULL) {
+                *objHdr = obj->header;
+            }
+
+            e = BfM_FreeTrain(catObjForFile, PAGE_BUF);
+            if(e) ERR(e);
+            e = BfM_FreeTrain(&pid, PAGE_BUF);
+            if(e) ERR(e);
+
+            return(eNOERROR);
+        }
+        else {
+            e = BfM_FreeTrain(catObjForFile, PAGE_BUF);
+            if(e) ERR(e);
+            e = BfM_FreeTrain(&pid, PAGE_BUF);
+            if(e) ERR(e);
+        }
+    }
 
     return(EOS);
     
