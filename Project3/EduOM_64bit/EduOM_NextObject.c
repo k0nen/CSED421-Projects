@@ -110,6 +110,9 @@ Four EduOM_NextObject(
             0,
             apage->slot[0].unique
         );
+        if(objHdr != NULL) {
+            *objHdr = obj->header;
+        }
 
         e = BfM_FreeTrain(catObjForFile, PAGE_BUF);
         if(e) ERR(e);
@@ -136,6 +139,9 @@ Four EduOM_NextObject(
                 i + 1,
                 apage->slot[-i-1].unique
             );
+             if(objHdr != NULL) {
+                *objHdr = obj->header;
+            }
 
             e = BfM_FreeTrain(catObjForFile, PAGE_BUF);
             if(e) ERR(e);
@@ -162,6 +168,9 @@ Four EduOM_NextObject(
                 0,
                 apage->slot[0].unique
             );
+            if(objHdr != NULL) {
+                *objHdr = obj->header;
+            }
 
             e = BfM_FreeTrain(catObjForFile, PAGE_BUF);
             if(e) ERR(e);
