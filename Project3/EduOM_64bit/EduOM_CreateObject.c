@@ -220,7 +220,6 @@ Four eduom_CreateObject(
         }
     }
     else {
-
         // Check availspaceList
         if(neededSpace <= SP_10SIZE && catEntry->availSpaceList10 != NIL) {
             pid.pageNo = catEntry->availSpaceList10;
@@ -264,6 +263,7 @@ Four eduom_CreateObject(
 
     // Allocate a new page if necessary
     if(needToAllocPage) {
+        e = BfM_SetDirty(catObjForFile, PAGE_BUF);
         e = RDsM_PageIdToExtNo(&pFid, &firstExt);
         if(e) ERR(e);
         e = RDsM_AllocTrains(fid.volNo, firstExt, &nearPid, catEntry->eff, 1, PAGESIZE2, &pid);
@@ -323,6 +323,7 @@ Four eduom_CreateObject(
     oid->unique = apage->slot[-i].unique;
 
     // Free resources
+    BfM_SetDirty(&pid, PAGE_BUF);
     BfM_FreeTrain(&pid, PAGE_BUF);
     BfM_FreeTrain(&pFid, PAGE_BUF);
     if(nearObj != NIL && needToAllocPage) {
