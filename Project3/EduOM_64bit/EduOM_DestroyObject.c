@@ -97,7 +97,6 @@ Four EduOM_DestroyObject(
     DeallocListElem *dlElem;	/* pointer to element of dealloc list */
     PhysicalFileID pFid;	/* physical ID of file */
     
-    
 
     /*@ Check parameters. */
     if (catObjForFile == NULL) ERR(eBADCATALOGOBJECT_OM);
@@ -105,7 +104,63 @@ Four EduOM_DestroyObject(
     if (oid == NULL) ERR(eBADOBJECTID_OM);
 
 
-    
+    MAKE_PHYSICALFILEID(pFid, catObjForFile->volNo, catObjForFile->pageNo);
+    e = BfM_GetTrain(&pFid, &catPage, PAGE_BUF);
+    if(e) ERR(e);
+    GET_PTR_TO_CATENTRY_FOR_DATA(catObjForFile, catPage, catEntry);
+
+    MAKE_PAGEID(pid, oid->volNo, oid->pageNo);
+    BfM_GetTrain(&pid, &apage, PAGE_BUF);
+    if(e) ERR(e);
+
+    i = oid->slotNo;
+    offset = apage->slot[-i].offset;
+    obj = &(apage->data[offset]);
+
+    // Detach from available space list
+    e = om_RemoveFromAvailSpaceList(catObjForFile, &pid, apage);
+    if(e) ERRB1(e, &pid, PAGE_BUF);
+
+    // Update slot to empty slot
+    apage->slot[-i].offset = EMPTYSLOT;
+
+    // Update page header
+    if(i + 1 == apage->header.nSlots) {
+        apage->header.nSlots--;
+    }
+
+    alignedLen = ALIGNED_LENGTH(obj->header.length);
+
+    last = (offset + alignedLen + sizeof(ObjectHdr) == apage->header.free);
+    if(last) {
+        apage->header.free -= alignedLen + sizeof(ObjectHdr);
+    }
+    else {
+        apage->header.unused += alignedLen + sizeof(ObjectHdr);
+    }
+
+    // Extra case - object is the only object of page, page isn't first page of file
+    if(apage->header.nSlots == 0 && apage->header.prevPage != NIL) {
+        e = om_FileMapDeletePage(catObjForFile, &pid);
+        if(e) ERRB1(e, &pid, PAGE_BUF);
+        e = Util_getElementFromPool(dlPool, &dlElem);
+        if(e) ERRB1(e, &pid, PAGE_BUF);
+        
+        dlElem->type = DL_PAGE;
+        dlElem->elem.pid = pid;
+        dlElem->next = dlHead;
+        dlHead = dlElem;
+    }
+    else {
+        e = om_PutInAvailSpaceList(catObjForFile, &pid, apage);
+        if(e) ERRB1(e, &pid, PAGE_BUF);
+    }
+
+    e = BfM_FreeTrain(apage, PAGE_BUF);
+    if(e) ERR(e);
+    e = BfM_FreeTrain(catPage, PAGE_BUF);
+    if(e) ERR(e);
+
     return(eNOERROR);
     
 } /* EduOM_DestroyObject() */

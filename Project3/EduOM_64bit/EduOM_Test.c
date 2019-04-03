@@ -58,7 +58,7 @@ char* itoa(Four val, Four base);
  *  composed of object header, slot, and data.
  *  There are five operations in EduOM.
  *  EduOM_Test() test these below operations in EduOM.
- *  OM_CreateObject(), OM_DestroyObject(), EduOM_ReadObject(),
+ *  OM_CreateObject(), EduOM_DestroyObject(), EduOM_ReadObject(),
  *  EduOM_PrevObject(), EduOM_NextObject().
  *
  *
@@ -90,7 +90,7 @@ Four EduOM_Test(Four volId, Four handle){
 	if (e < eNOERROR) ERR(e);
 
 	/* #1 Start the test for OM_CreateObject */
-	printf("****************************** TEST#1, OM_CreateObject and OM_DestroyObject ******************************\n");
+	printf("****************************** TEST#1, OM_CreateObject and EduOM_DestroyObject ******************************\n");
 	/* Test for OM_CreateObject() when a near object is NULL */
 	printf("*Test 1_1 : Test for OM_CreateObject() when a near object is NULL\n");
 	printf("->Insert a new object into a empty page\n\n");
@@ -148,8 +148,8 @@ Four EduOM_Test(Four volId, Four handle){
     printf("\n---------------------------------- Result ----------------------------------\n");
 	eduom_DumpAllPage(&dumpPage);
 	
-	/* Test for OM_DestroyObject() when destroying object is not last object in the page */
-	printf("*Test 1_4 : Test for OM_DestroyObject() when destroying object is not last object in the page\n");
+	/* Test for EduOM_DestroyObject() when destroying object is not last object in the page */
+	printf("*Test 1_4 : Test for EduOM_DestroyObject() when destroying object is not last object in the page\n");
 	printf("->Destroy ten objects from the page.\n\n");
 	oid = firstOid;
 	for (i = 0; i < 10; i++)
@@ -157,7 +157,7 @@ Four EduOM_Test(Four volId, Four handle){
 		oid.slotNo += 2;
 		oid.unique += 2;
 		/* The successful default solution code is called if "Edu" is omitted from the function name in the following line */
-		OM_DestroyObject(&catalogEntry, &oid, &dlPool, &dlHead);
+		EduOM_DestroyObject(&catalogEntry, &oid, &dlPool, &dlHead);
 		printf("The object ( %d, %d )  is destroyed from the page\n", oid.pageNo, oid.slotNo);
 	}
 
@@ -187,12 +187,12 @@ Four EduOM_Test(Four volId, Four handle){
 	printf("\n---------------------------------- Result ----------------------------------\n");
 	eduom_DumpOnePage(&dumpPage);
 
-	/* Test for OM_DestroyObject() when the object is last object in the page */
-	printf("*Test 1_6 : Test for OM_DestroyObject() when the object is last object in the page\n");
+	/* Test for EduOM_DestroyObject() when the object is last object in the page */
+	printf("*Test 1_6 : Test for EduOM_DestroyObject() when the object is last object in the page\n");
 	printf("->Destroy the last object form the 3rd page\n\n");
 	
 	/* The successful default solution code is called if "Edu" is omitted from the function name in the following line */
-	e = OM_DestroyObject(&catalogEntry, &lastOid, &dlPool, &dlHead);
+	e = EduOM_DestroyObject(&catalogEntry, &lastOid, &dlPool, &dlHead);
 	if (e < eNOERROR) ERR(e);
 	printf("The object ( %d, %d )  is destroyed from the page\n", lastOid.pageNo, lastOid.slotNo);
 
@@ -210,14 +210,14 @@ Four EduOM_Test(Four volId, Four handle){
 	getchar();          
 	printf("\n\n");
 
-	/* Test 1_7 : Test for OM_DestroyObject() when the object is unique object in the page */
-	printf("*Test 1_7 : Test for OM_DestroyObject() when the object is unique object in the page\n");
+	/* Test 1_7 : Test for EduOM_DestroyObject() when the object is unique object in the page */
+	printf("*Test 1_7 : Test for EduOM_DestroyObject() when the object is unique object in the page\n");
 	printf("->Destroy objects until destroying object is last object form the 3rd page\n\n");
 
 	
 	do{
 		/* The successful default solution code is called if "Edu" is omitted from the function name in the following line */
-		e = OM_DestroyObject(&catalogEntry, &lastOid, &dlPool, &dlHead);
+		e = EduOM_DestroyObject(&catalogEntry, &lastOid, &dlPool, &dlHead);
 		if (e < eNOERROR) ERR(e);
 		
 		printf("The object ( %d, %d )  is destroyed from the page\n", lastOid.pageNo, lastOid.slotNo);
@@ -239,7 +239,7 @@ Four EduOM_Test(Four volId, Four handle){
 
 	
 
-	printf("****************************** TEST#1, OM_CreateObject and OM_DestroyObject  ******************************\n");
+	printf("****************************** TEST#1, OM_CreateObject and EduOM_DestroyObject  ******************************\n");
 /* #1 End the test */
 
 
