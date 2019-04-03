@@ -110,7 +110,7 @@ Four EduOM_DestroyObject(
     GET_PTR_TO_CATENTRY_FOR_DATA(catObjForFile, catPage, catEntry);
 
     MAKE_PAGEID(pid, oid->volNo, oid->pageNo);
-    BfM_GetTrain(&pid, &apage, PAGE_BUF);
+    e = BfM_GetTrain(&pid, &apage, PAGE_BUF);
     if(e) ERR(e);
 
     i = oid->slotNo;
