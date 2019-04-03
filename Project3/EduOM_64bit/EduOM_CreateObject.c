@@ -190,8 +190,130 @@ Four eduom_CreateObject(
     /* Error check whether using not supported functionality by EduOM */
     if(ALIGNED_LENGTH(length) > LRGOBJ_THRESHOLD) ERR(eNOTSUPPORTED_EDUOM);
     
+
+    MAKE_PHYSICALFILEID(pFid, catObjForFile->volNo, catObjForFile->pageNo);
+    e = BfM_GetTrain(&pFid, &catPage, PAGE_BUF);
+    if(e) ERR(e);
+    GET_PTR_TO_CATENTRY_FOR_DATA(catObjForFile, catPage, catEntry);
+
+    alignedLen = ALIGNED_LENGTH(length);
+    neededSpace = sizeof(ObjectHdr) + alignedLen + sizeof(SlottedPageSlot);
+
+    // Determine the page to insert
+    if(nearObj != NULL) {
+        MAKE_PAGEID(nearPid, nearObj->volNo, nearObj->pageNo);
+        e = BfM_GetTrain(&nearPid, &apage, PAGE_BUF);
+        if(e) ERRB1(e, &pFid, PAGE_BUF);
+
+        // If page with nearObj has enough space
+        if(neededSpace <= SP_FREE(apage)) {
+            pid = nearPid;
+            needToAllocPage = FALSE;
+            e = om_RemoveFromAvailSpaceList(catObjForFile, &nearPid, apage);
+            if(e) ERRB1(e, &nearPid, PAGE_BUF);
+        }
+        else {
+            needToAllocPage = TRUE;
+        }
+    }
+    else {
+        // Check availspaceList
+        fid = catEntry->fid;
+        MAKE_PAGEID(pid, fid.volNo, NIL);
+
+        if(neededSpace <= SP_10SIZE && catEntry->availSpaceList10 != NIL) {
+            pid.pageNo = catEntry->availSpaceList10;
+        }
+        else if(neededSpace <= SP_20SIZE && catEntry->availSpaceList20 != NIL) {
+            pid.pageNo = catEntry->availSpaceList20;
+        }
+        else if(neededSpace <= SP_30SIZE && catEntry->availSpaceList30 != NIL) {
+            pid.pageNo = catEntry->availSpaceList30;
+        }
+        else if(neededSpace <= SP_40SIZE && catEntry->availSpaceList40 != NIL) {
+            pid.pageNo = catEntry->availSpaceList40;
+        }
+        else if(neededSpace <= SP_50SIZE && catEntry->availSpaceList50 != NIL) {
+            pid.pageNo = catEntry->availSpaceList50;
+            printf("aaaaa\n");
+        }
+
+        if(pid.pageNo != NIL) {
+            needToAllocPage = FALSE;
+
+            e = BfM_GetTrain(&pid, &apage, PAGE_BUF);
+            if(e) ERRB1(e, &catPage, PAGE_BUF);
+            e = om_RemoveFromAvailSpaceList(catObjForFile, &pid, apage);
+            if(e) ERRB1(e, &catPage, PAGE_BUF);
+        }
+        else {
+            // Check last page of file for space
+            pid.pageNo = catEntry->lastPage;
+            e = BfM_GetTrain(&pid, &apage, PAGE_BUF);
+            if(e) ERRB1(e, &catPage, PAGE_BUF);
+
+            if(neededSpace <= SP_FREE(apage)) {
+                needToAllocPage = FALSE;
+            }
+            else {
+                needToAllocPage = TRUE;
+            }
+            
+        }
+    }
+
+    // Allocate a new page if necessary
+    if(needToAllocPage) {
+
+
+        if(nearObj != NULL) {
+
+        }
+        else {
+
+        }
+    }
+
+    // Compact page if necessary
+    if(neededSpace > SP_CFREE(apage)) {
+        e = EduOM_CompactPage(apage, NIL);
+        if(e) ERRB1(e, &nearPid, PAGE_BUF);
+    }
+
+    // Insert object to page
+    i = 0;
+    while(i < apage->header.nSlots) {
+        if(apage->slot[-i].offset == EMPTYSLOT) {
+            break;
+        }
+        i++;
+    }
+    if(i == apage->header.nSlots) {
+        apage->header.nSlots++;
+    }
     
-    
+    apage->slot[-i].offset = apage->header.free;
+    obj = &(apage->data[apage->slot[-i].offset]);
+    obj->header.length = length;
+    obj->header.properties = 0x0;
+    memcpy(obj->data, data, length);
+
+    apage->header.free += sizeof(ObjectHdr) + alignedLen;
+
+    om_PutInAvailSpaceList(catObjForFile, &pid, apage);
+
+    oid->pageNo = pid.pageNo;
+    oid->volNo = pid.volNo;
+    oid->slotNo = i;
+    om_GetUnique(&pid, &oid->unique);
+
+    // Free resources
+    BfM_FreeTrain(&pid, PAGE_BUF);
+    BfM_FreeTrain(&pFid, PAGE_BUF);
+    if(nearObj != NIL && needToAllocPage) {
+        BfM_FreeTrain(&nearPid, PAGE_BUF);
+    }
+
     return(eNOERROR);
     
 } /* eduom_CreateObject() */

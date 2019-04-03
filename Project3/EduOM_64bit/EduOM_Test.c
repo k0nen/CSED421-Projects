@@ -58,7 +58,7 @@ char* itoa(Four val, Four base);
  *  composed of object header, slot, and data.
  *  There are five operations in EduOM.
  *  EduOM_Test() test these below operations in EduOM.
- *  OM_CreateObject(), EduOM_DestroyObject(), EduOM_ReadObject(),
+ *  EduOM_CreateObject(), EduOM_DestroyObject(), EduOM_ReadObject(),
  *  EduOM_PrevObject(), EduOM_NextObject().
  *
  *
@@ -89,14 +89,14 @@ Four EduOM_Test(Four volId, Four handle){
 	e = sm_GetCatalogEntryFromDataFileId(ARRAYINDEX, &fid, &catalogEntry);
 	if (e < eNOERROR) ERR(e);
 
-	/* #1 Start the test for OM_CreateObject */
-	printf("****************************** TEST#1, OM_CreateObject and EduOM_DestroyObject ******************************\n");
-	/* Test for OM_CreateObject() when a near object is NULL */
-	printf("*Test 1_1 : Test for OM_CreateObject() when a near object is NULL\n");
+	/* #1 Start the test for EduOM_CreateObject */
+	printf("****************************** TEST#1, EduOM_CreateObject and EduOM_DestroyObject ******************************\n");
+	/* Test for EduOM_CreateObject() when a near object is NULL */
+	printf("*Test 1_1 : Test for EduOM_CreateObject() when a near object is NULL\n");
 	printf("->Insert a new object into a empty page\n\n");
 	strcat(omTestObjectNo, "0");
 	/* The successful default solution code is called if "Edu" is omitted from the function name in the following line */
-	e = OM_CreateObject(&catalogEntry, NULL, NULL, strlen(omTestObjectNo), omTestObjectNo , &oid);
+	e = EduOM_CreateObject(&catalogEntry, NULL, NULL, strlen(omTestObjectNo), omTestObjectNo , &oid);
 	if (e < eNOERROR) ERR(e);
 	printf("The object ( %d, %d )  is inserted into the page\n", oid.pageNo, oid.slotNo);
     firstOid = oid;
@@ -106,8 +106,8 @@ Four EduOM_Test(Four volId, Four handle){
 	getchar();
 	printf("\n\n");
 
-	/* Test for EduOM_CreateObjecT() when a near object is not NULL */
-	printf("*Test 1_2 : Test for OM_CreateObject() when a near object is not NULL\n");
+	/* Test for EduEduOM_CreateObject() when a near object is not NULL */
+	printf("*Test 1_2 : Test for EduOM_CreateObject() when a near object is not NULL\n");
 	printf("->Insert new objects into the page until the page is full\n\n");
 
 	if (e < eNOERROR) ERR(e);
@@ -115,7 +115,7 @@ Four EduOM_Test(Four volId, Four handle){
 		strcpy(omTestObjectNo, "EduOM_TestModule_OBJECT_NUM_");
 		strcat(omTestObjectNo, itoa(i,10));	
 		/* The successful default solution code is called if "Edu" is omitted from the function name in the following line */
-		e = OM_CreateObject(&catalogEntry, &oid, NULL, strlen(omTestObjectNo), omTestObjectNo, &oid);
+		e = EduOM_CreateObject(&catalogEntry, &oid, NULL, strlen(omTestObjectNo), omTestObjectNo, &oid);
 		if(e < eNOERROR) ERR(e);		  
 		printf("The object ( %d, %d )  is inserted into the page\n", oid.pageNo, oid.slotNo);
 	}
@@ -135,7 +135,7 @@ Four EduOM_Test(Four volId, Four handle){
         strcpy(omTestObjectNo, "EduOM_TestModule_OBJECT_NUM_");
 		strcat(omTestObjectNo, itoa(i,10));
 		/* The successful default solution code is called if "Edu" is omitted from the function name in the following line */
-		e = OM_CreateObject(&catalogEntry, &oid, NULL, strlen(omTestObjectNo), omTestObjectNo, &oid);
+		e = EduOM_CreateObject(&catalogEntry, &oid, NULL, strlen(omTestObjectNo), omTestObjectNo, &oid);
 		if (e < eNOERROR) ERR(e);
 		printf("The object ( %d, %d )  is inserted into the page\n", oid.pageNo, oid.slotNo);
 	}
@@ -169,13 +169,13 @@ Four EduOM_Test(Four volId, Four handle){
 	 printf("\n---------------------------------- Result ----------------------------------\n");
 	 eduom_DumpOnePage(&dumpPage);
 
-	/*  Test for OM_CreateObject() when needing page compact */
-	printf("*Test 1_5 : Test for OM_CreateObject() when needing page compact\n");
+	/*  Test for EduOM_CreateObject() when needing page compact */
+	printf("*Test 1_5 : Test for EduOM_CreateObject() when needing page compact\n");
 	printf("->Insert a new object into the page which needs page compact\n\n");
 	oid = firstOid;
 	strcpy(omTestObjectNo, "EduOM_OBJECT_FOR_COMPACT_TEST");
 	/* The successful default solution code is called if "Edu" is omitted from the function name in the following line */
-	e = OM_CreateObject(&catalogEntry, &oid, NULL, strlen(omTestObjectNo), omTestObjectNo, &oid);
+	e = EduOM_CreateObject(&catalogEntry, &oid, NULL, strlen(omTestObjectNo), omTestObjectNo, &oid);
 	if (e < eNOERROR) ERR(e);
 	printf("The object ( %d, %d )  is inserted into the page\n", oid.pageNo, oid.slotNo);
 
@@ -239,7 +239,7 @@ Four EduOM_Test(Four volId, Four handle){
 
 	
 
-	printf("****************************** TEST#1, OM_CreateObject and EduOM_DestroyObject  ******************************\n");
+	printf("****************************** TEST#1, EduOM_CreateObject and EduOM_DestroyObject  ******************************\n");
 /* #1 End the test */
 
 
