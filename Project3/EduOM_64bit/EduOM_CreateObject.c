@@ -199,6 +199,9 @@ Four eduom_CreateObject(
     alignedLen = ALIGNED_LENGTH(length);
     neededSpace = sizeof(ObjectHdr) + alignedLen + sizeof(SlottedPageSlot);
 
+    fid = catEntry->fid;
+    MAKE_PAGEID(pid, fid.volNo, NIL);
+
     // Determine the page to insert
     if(nearObj != NULL) {
         MAKE_PAGEID(nearPid, nearObj->volNo, nearObj->pageNo);
@@ -217,10 +220,8 @@ Four eduom_CreateObject(
         }
     }
     else {
-        // Check availspaceList
-        fid = catEntry->fid;
-        MAKE_PAGEID(pid, fid.volNo, NIL);
 
+        // Check availspaceList
         if(neededSpace <= SP_10SIZE && catEntry->availSpaceList10 != NIL) {
             pid.pageNo = catEntry->availSpaceList10;
         }
@@ -235,7 +236,6 @@ Four eduom_CreateObject(
         }
         else if(neededSpace <= SP_50SIZE && catEntry->availSpaceList50 != NIL) {
             pid.pageNo = catEntry->availSpaceList50;
-            printf("aaaaa\n");
         }
 
         if(pid.pageNo != NIL) {
@@ -264,14 +264,28 @@ Four eduom_CreateObject(
 
     // Allocate a new page if necessary
     if(needToAllocPage) {
+        e = RDsM_PageIdToExtNo(&pFid, &firstExt);
+        if(e) ERR(e);
+        e = RDsM_AllocTrains(fid.volNo, firstExt, &nearPid, catEntry->eff, 1, PAGESIZE2, &pid);
+        if(e) ERR(e);
+        e = BfM_GetNewTrain(&pid, &apage, PAGE_BUF);
+        if(e) ERR(e);
 
+        // Initialize header of new page
+        apage->header.nSlots = 0;
+        apage->header.free = 0;
+        apage->header.unused = 0;
+        apage->header.unique = 0;
+        apage->header.uniqueLimit = 0;
+        apage->header.pid = pid;
+        apage->header.fid = fid;
+        SET_PAGE_TYPE(apage, SLOTTED_PAGE_TYPE);
 
-        if(nearObj != NULL) {
-
+        if(nearObj == NULL) {
+            MAKE_PAGEID(nearPid, NIL, NIL);
         }
-        else {
-
-        }
+        e = om_FileMapAddPage(catObjForFile, &nearPid, &pid);
+        if(e) ERRB1(e, &pid, PAGE_BUF);
     }
 
     // Compact page if necessary
@@ -305,7 +319,8 @@ Four eduom_CreateObject(
     oid->pageNo = pid.pageNo;
     oid->volNo = pid.volNo;
     oid->slotNo = i;
-    om_GetUnique(&pid, &oid->unique);
+    om_GetUnique(&pid, &apage->slot[-i].unique);
+    oid->unique = apage->slot[-i].unique;
 
     // Free resources
     BfM_FreeTrain(&pid, PAGE_BUF);

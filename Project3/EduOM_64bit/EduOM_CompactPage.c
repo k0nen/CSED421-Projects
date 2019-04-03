@@ -88,59 +88,46 @@ Four EduOM_CompactPage(
     Two    i;			/* index variable */
 
     apageDataOffset = 0;
+    lastSlot = 0;
+    tpage = *apage;
 
-    if(slotNo != NIL) {
-        for(i = 0; i < apage->header.nSlots; i++) {
-            if(apage->slot[-i].offset == EMPTYSLOT || i == slotNo) {
-                continue;
-            }
-
-            obj = &(apage->data[apage->slot[-i].offset]);
-
-            len = ALIGNED_LENGTH(obj->header.length) + sizeof(ObjectHdr);
-            memmove(
-                apage->data[apageDataOffset],
-                obj,
-                len
-            );
-
-            apageDataOffset += len;
+    for(i = 0; i < tpage.header.nSlots; i++) {
+        if(tpage.slot[-i].offset == EMPTYSLOT || i == slotNo) {
+            continue;
         }
 
-        if(apage->slot[-slotNo].offset != EMPTYSLOT) {
-            obj = &(apage->slot[-slotNo].offset);
+        obj = &(tpage.data[tpage.slot[-i].offset]);
 
-            len = ALIGNED_LENGTH(obj->header.length) + sizeof(ObjectHdr);
-            memmove(
-                apage->data[apageDataOffset],
-                obj,
-                len
-            );
+        len = ALIGNED_LENGTH(obj->header.length) + sizeof(ObjectHdr);
+        memmove(
+            &(apage->data[apageDataOffset]),
+            obj,
+            len
+        );
 
-            apageDataOffset += len;
-        }
+        apage->slot[-i].offset = apageDataOffset;
+        apageDataOffset += len;
+        lastSlot++;
     }
-    else {
-        for(i = 0; i < apage->header.nSlots; i++) {
-            if(apage->slot[-i].offset == EMPTYSLOT) {
-                continue;
-            }
 
-            obj = &apage->data[apage->slot[-i].offset];
+    if(slotNo != NIL && tpage.slot[-slotNo].offset != EMPTYSLOT) {
+        obj = &(tpage.slot[-slotNo].offset);
 
-            len = ALIGNED_LENGTH(obj->header.length) + sizeof(ObjectHdr);
-            memmove(
-                apage->data[apageDataOffset],
-                obj,
-                len
-            );
+        len = ALIGNED_LENGTH(obj->header.length) + sizeof(ObjectHdr);
+        memmove(
+            &(apage->data[apageDataOffset]),
+            obj,
+            len
+        );
 
-            apageDataOffset += len;
-        }
+        apage->slot[-i].offset = apageDataOffset;
+        apageDataOffset += len;
+        lastSlot++;
     }
 
     apage->header.unused = 0;
     apage->header.free = apageDataOffset;
+    //apage->header.nSlots = lastSlot;
 
     return(eNOERROR);
     
