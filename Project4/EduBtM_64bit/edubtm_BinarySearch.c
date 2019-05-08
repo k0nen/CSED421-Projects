@@ -88,6 +88,47 @@ Boolean edubtm_BinarySearchInternal(
             ERR(eNOTSUPPORTED_EDUBTM);
     }
 
+    low = 0;
+    high = ipage->hdr.nSlots - 1;
+
+    if(high >= 0) {
+        do {
+            mid = (low + high) / 2;
+            entry = &(ipage->data[ipage->slot[-mid]]);
+            cmp = edubtm_KeyCompare(kdesc, kval, &entry->klen);
+
+            switch(cmp) {
+            case LESS:
+                high = mid - 1;
+                break;
+            case EQUAL:
+                high = mid - 1;
+                low = mid + 1;
+                break;
+            case GREAT:
+                low = mid + 1;
+                break;
+            default:
+                break;
+            }
+        } while (high >= low);
+
+        if(low - high > 1) {
+            // Key found
+            *idx = mid;
+            return TRUE;
+        }
+        else {
+            // Key not found
+            *idx = high;
+            return FALSE;
+        }
+    }
+    else {
+        // No entries
+        *idx = -1;
+        return FALSE;
+    }
     
 } /* edubtm_BinarySearchInternal() */
 
@@ -135,5 +176,46 @@ Boolean edubtm_BinarySearchLeaf(
             ERR(eNOTSUPPORTED_EDUBTM);
     }
 
-    
+    low = 0;
+    high = lpage->hdr.nSlots - 1;
+
+    if(high >= 0) {
+        do {
+            mid = (low + high) / 2;
+            entry = &(lpage->data[lpage->slot[-mid]]);
+            cmp = edubtm_KeyCompare(kdesc, kval, &entry->klen);
+
+            switch(cmp) {
+            case LESS:
+                high = mid - 1;
+                break;
+            case EQUAL:
+                high = mid - 1;
+                low = mid + 1;
+                break;
+            case GREAT:
+                low = mid + 1;
+                break;
+            default:
+                break;
+            }
+        } while (high >= low);
+
+        if(low - high > 1) {
+            // Key found
+            *idx = mid;
+            return TRUE;
+        }
+        else {
+            // Key not found
+            *idx = high;
+            return FALSE;
+        }
+    }
+    else {
+        // No entries
+        *idx = -1;
+        return FALSE;
+    }
+
 } /* edubtm_BinarySearchLeaf() */
