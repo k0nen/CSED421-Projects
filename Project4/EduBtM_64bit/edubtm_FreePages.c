@@ -81,7 +81,43 @@ Four edubtm_FreePages(
     btm_LeafEntry       *lEntry;        /* a leaf entry */
     DeallocListElem     *dlElem;        /* an element of dealloc list */
 
+    e = BfM_GetTrain(curPid, &apage, PAGE_BUF);
+    if(e) ERR(e);
 
+    // If internal page, then call recursively
+    if(apage->any.hdr.type & INTERNAL) {
+        // First page
+        MAKE_PAGEID(tPid, curPid->volNo, apage->bi.hdr.p0);
+        e = edubtm_FreePages(pFid, &tPid, dlPool, dlHead);
+        if(e) ERRB1(e, curPid, PAGE_BUF);
+
+        for(i=0; i<apage->bi.hdr.nSlots; i++) {
+            iEntryOffset = apage->bi.slot[-i];
+            iEntry = apage->bi.data[iEntryOffset];
+
+            MAKE_PAGEID(tPid, curPid->volNo, iEntry->spid);
+            e = edubtm_FreePages(pFid, &tPid, dlPool, dlHead);
+            if(e) ERRB1(e, curPid, PAGE_BUF);
+        }
+    }
+    else if(!(apage->any.hdr.type & LEAF))
+        ERRB1(eBADBTREEPAGE_BTM, curPid, PAGE_BUF);
+
+    // Finally, deallocate current page
+    apage->any.hdr.type = FREEPAGE;
+    
+    e = BfM_SetDirty(curPid, PAGE_BUF);
+    if(e) ERRB1(e, curPid, PAGE_BUF);
+    e = BfM_FreeTrain(curPid, PAGE_BUF);
+    if(e) ERRB1(e, curPid, PAGE_BUF);
+
+    e = Util_getElementFromPool(dlPool, &dlElem);
+    if(e) ERR(e);
+
+    dlElem->type = DL_PAGE;
+    dlElem->elem.pid = *curPid;
+    dlElem->next = dlHead->next;
+    dlHead = dlElem;
     
     return(eNOERROR);
     
