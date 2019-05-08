@@ -2,5 +2,5 @@ Output/
 odysseus_error.log
 *.vol
 .vscode/
-./EduBtM_Test
-./EduBtM_TestSolution
+EduBtM_Test
+EduBtM_TestSolution

@@ -70,7 +70,23 @@ Four EduBtM_CreateIndex(
     sm_CatOverlayForBtree *catEntry; /* pointer to Btree file catalog information */
     PhysicalFileID pFid;	/* physical file ID */
 
+    printf("hello\n");
 
+    // FileID of BTree file
+    e = BfM_GetTrain(catObjForFile, &catPage, PAGE_BUF);
+    if(e) ERR(e);
+    GET_PTR_TO_CATENTRY_FOR_BTREE(catObjForFile, catPage, catEntry);
+    MAKE_PHYSICALFILEID(pFid, catEntry->fid.volNo, catEntry->firstPage);
+    e = BfM_FreeTrain(catObjForFile, PAGE_BUF);
+    if(e) ERR(e);
+
+    // New page for root
+    e = btm_AllocPage(catObjForFile, &pFid, rootPid);
+    if(e) ERR(e);
+
+    // Initialize
+    e = edubtm_InitLeaf(rootPid, TRUE, FALSE);
+    if(e) ERR(e);
 
     return(eNOERROR);
     

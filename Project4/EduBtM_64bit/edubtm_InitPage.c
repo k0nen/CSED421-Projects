@@ -99,8 +99,25 @@ Four edubtm_InitLeaf(
     Four e;			/* error number */
     BtreeLeaf *page;		/* a page pointer */
 
+    e = BfM_GetNewTrain(leaf, &page, PAGE_BUF);
+    if(e) ERR(e);
 
-    
+    page->hdr.pid.pageNo = leaf->pageNo;
+    page->hdr.pid.volNo = leaf->volNo;
+    SET_PAGE_TYPE(page, BTREE_PAGE_TYPE);
+    page->hdr.type = LEAF | (root ? ROOT : INTERNAL);
+
+    page->hdr.nSlots = 0;
+    page->hdr.free = 0;
+    page->hdr.prevPage = NIL;
+    page->hdr.nextPage = NIL;
+    page->hdr.unused = 0;
+
+    e = BfM_SetDirty(leaf, PAGE_BUF);
+    if(e) ERRB1(e, leaf, PAGE_BUF);
+    e = BfM_FreeTrain(leaf, PAGE_BUF);
+    if(e) ERR(e);
+
     return(eNOERROR);
     
 }  /* edubtm_InitLeaf() */
