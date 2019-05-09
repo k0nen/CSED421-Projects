@@ -197,7 +197,7 @@ Four edubtm_Fetch(
     // Leaf node
     else if(apage->any.hdr.type & LEAF) {
         found = edubtm_BinarySearchLeaf(&(apage->bi), kdesc, startKval, &idx);
-        printf("Fetch leaf node - idx is %d\n", idx);
+        printf("Fetch leaf node - idx is %d, found is %d\n", idx, found);
 
         slotNo = idx;
         leafPid = root;
@@ -234,6 +234,8 @@ Four edubtm_Fetch(
         case SM_GE:
             if(startCompOp == SM_GT || !found) {
                 slotNo++;
+
+                found = TRUE;
 
                 // First object is in another page
                 if(slotNo >= apage->bl.hdr.nSlots) {
