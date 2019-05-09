@@ -66,7 +66,23 @@ Four edubtm_InitInternal(
     Four e;			/* error number */
     BtreeInternal *page;	/* a page pointer */
 
+    e = BfM_GetNewTrain(internal, &page, PAGE_BUF);
+    if(e) ERR(e);
 
+    page->hdr.pid.pageNo = internal->pageNo;
+    page->hdr.pid.volNo = internal->volNo;
+    SET_PAGE_TYPE(page, BTREE_PAGE_TYPE);
+    page->hdr.type = INTERNAL | (root ? ROOT : 0);
+
+    page->hdr.nSlots = 0;
+    page->hdr.free = 0;
+    page->hdr.p0 = NIL;
+    page->hdr.unused = 0;
+
+    e = BfM_SetDirty(internal, PAGE_BUF);
+    if(e) ERRB1(e, internal, PAGE_BUF);
+    e = BfM_FreeTrain(internal, PAGE_BUF);
+    if(e) ERR(e);
     
     return(eNOERROR);
     

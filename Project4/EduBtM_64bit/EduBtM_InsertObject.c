@@ -96,8 +96,24 @@ Four EduBtM_InsertObject(
         if(kdesc->kpart[i].type!=SM_INT && kdesc->kpart[i].type!=SM_VARSTRING)
             ERR(eNOTSUPPORTED_EDUBTM);
     }
-    
-    
+
+    e = BfM_GetTrain(catObjForFile, &catPage, PAGE_BUF);
+    if(e) ERR(e);
+
+    // Insert object
+    e = edubtm_Insert(catObjForFile, root, kdesc, kval, oid, &lf, &lh, &item, dlPool, dlHead);
+    if(e) ERR(e);
+
+    // Root split
+    if(lh) {
+        printf("AAAAAA\n");
+        e = edubtm_root_insert(catObjForFile, root, &item);
+        if(e) ERR(e);
+    }
+
+    e = BfM_FreeTrain(catObjForFile, PAGE_BUF);
+    if(e) ERRB1(e, catObjForFile, PAGE_BUF);
+
     return(eNOERROR);
     
 }   /* EduBtM_InsertObject() */

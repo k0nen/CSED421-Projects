@@ -117,7 +117,61 @@ Four edubtm_Insert(
             ERR(eNOTSUPPORTED_EDUBTM);
     }
 
-    
+    e = BfM_GetTrain(catObjForFile, &catPage, PAGE_BUF);
+    if(e) ERR(e);
+
+    GET_PTR_TO_CATENTRY_FOR_BTREE(catObjForFile, catPage, catEntry);
+    MAKE_PHYSICALFILEID(pFid, catEntry->fid.volNo, catEntry->firstPage);
+
+    e = BfM_FreeTrain(catObjForFile, PAGE_BUF);
+    if(e) ERR(e);
+
+    *f = FALSE;
+    *h = FALSE;
+
+    e = BfM_GetTrain(root, &apage, PAGE_BUF);
+    if(e) ERR(e);
+
+    // If root is internal node
+    if(apage->any.hdr.type & INTERNAL) {
+        // Recursively search child
+        edubtm_BinarySearchInternal(&(apage->bi), kdesc, kval, &idx);
+        if(idx >= 0) {
+            iEntryOffset = apage->bi.slot[-idx];
+            iEntry = &(apage->bi.data[iEntryOffset]);
+            MAKE_PAGEID(newPid, root->volNo, iEntry->spid);
+        }
+        else MAKE_PAGEID(newPid, root->volNo, apage->bi.hdr.p0);
+
+        e = edubtm_Insert(catObjForFile, &newPid, kdesc, kval, oid, f, h, &litem, dlPool, dlHead);
+        if(e) ERRB1(e, root, PAGE_BUF);
+
+        // If child was splitted
+        if(lh) {
+            tKey.len = litem.klen;
+            memcpy(tKey.val, litem.kval, tKey.len);
+            edubtm_BinarySearchInternal(&(apage->bi), kdesc, &tKey, &idx);
+
+            e = edubtm_InsertInternal(catObjForFile, &(apage->bi), &litem, idx, h, item);
+            if(e) ERRB1(e, root, PAGE_BUF);
+            e = BfM_SetDirty(root, PAGE_BUF);
+            if(e) ERRB1(e, root, PAGE_BUF);
+        }
+    }
+    // If root is leaf node
+    else if(apage->any.hdr.type & LEAF) {
+        e = btm_InsertLeaf(catObjForFile, root, &(apage->bl), kdesc, kval, oid, f, h, item);
+        if(e) ERRB1(e, root, PAGE_BUF);
+
+        e = BfM_SetDirty(root, PAGE_BUF);
+        if(e) ERRB1(e, root, PAGE_BUF);
+    }
+    // Else: invalid!
+    else ERRB1(eBADBTREEPAGE_BTM, root, PAGE_BUF);
+
+    e = BfM_FreeTrain(root, PAGE_BUF);
+    if(e) ERR(e);
+
     return(eNOERROR);
     
 }   /* edubtm_Insert() */
@@ -182,7 +236,6 @@ Four edubtm_InsertLeaf(
         if(kdesc->kpart[i].type!=SM_INT && kdesc->kpart[i].type!=SM_VARSTRING)
             ERR(eNOTSUPPORTED_EDUBTM);
     }
-
     
     /*@ Initially the flags are FALSE */
     *h = *f = FALSE;
@@ -236,8 +289,32 @@ Four edubtm_InsertInternal(
     
     /*@ Initially the flag are FALSE */
     *h = FALSE;
-    
-    
+
+    entryLen = sizeof(ShortPageID) + ALIGNED_LENGTH(2 + item->klen);
+
+    // Is there enough space in page?
+    if(entryLen + 2 < BI_FREE(page)) {
+        // Compact if necessary
+        if(entryLen + 2 > BI_CFREE(page))
+            edubtm_CompactInternalPage(page, NIL);
+
+        for(i = page->hdr.nSlots - 1; i > high; i--)
+            page->slot[-i-1] = page->slot[-i];
+
+        // Store new item in slot
+        page->slot[-high-1] = page->hdr.free;
+        entryOffset = page->hdr.free;
+        entry = &(page->data[entryOffset]);
+        memcpy(entry, item, entryLen);
+        page->hdr.nSlots++;
+        page->hdr.free += entryLen;
+    }
+    // No, we need to split this page
+    else {
+        *h = TRUE;
+        e = edubtm_SplitInternal(catObjForFile, page, high, item, ritem);
+        if(e) ERR(e);
+    }
 
     return(eNOERROR);
     

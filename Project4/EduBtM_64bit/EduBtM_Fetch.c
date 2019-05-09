@@ -280,7 +280,7 @@ Four edubtm_Fetch(
 
             // Search end condition at the same time
             if(stopCompOp != SM_BOF && stopCompOp != SM_EOF && stopCompOp != SM_EQ) {
-                cmp = btm_KeyCompare(kdesc, &cursor->key, stopKval);
+                cmp =edubtm_KeyCompare(kdesc, &cursor->key, stopKval);
 
                 if(
                     cmp == EQUAL && (stopCompOp == SM_LT || stopCompOp == SM_GT) ||

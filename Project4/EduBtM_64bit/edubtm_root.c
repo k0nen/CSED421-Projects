@@ -80,7 +80,59 @@ Four edubtm_root_insert(
     btm_InternalEntry *entry;	/* an internal entry */
     Boolean   isTmp;
 
+    // Allocate new page
+    e = btm_AllocPage(catObjForFile, root, &newPid);
+    if(e) ERR(e);
+    e = BfM_GetNewTrain(&newPid, &newPage, PAGE_BUF);
+    if(e) ERRB1(e, root, PAGE_BUF);
 
+    // Read root
+    e = BfM_GetTrain(root, &rootPage, PAGE_BUF);
+    if(e) ERR(e);
+
+    if(rootPage->any.hdr.type & LEAF) {
+        MAKE_PAGEID(nextPid, root->volNo, rootPage->bl.hdr.nextPage);
+        e = BfM_GetTrain(&nextPid, &nextPage, PAGE_BUF);
+        if(e) ERRB1(e, root, PAGE_BUF);
+
+        nextPage->hdr.prevPage = newPid.pageNo;
+
+        e = BfM_SetDirty(&nextPid, PAGE_BUF);
+        if(e) ERRB1(e, root, PAGE_BUF);
+        e = BfM_FreeTrain(&nextPid, PAGE_BUF);
+        if(e) ERR(e);
+    }
+
+    // Copy root to new page
+    memmove(newPage, rootPage, sizeof(BtreePage));
+    newPage->bl.hdr.pid = newPid;
+
+    // Initialize root
+    e = edubtm_InitInternal(root, TRUE, FALSE);
+    if(e) ERRB1(e, root, PAGE_BUF);
+
+    printf("123123123123123123\n");
+    // Adjustments
+    rootPage->bi.hdr.nSlots = 1;
+    rootPage->bi.hdr.free = sizeof(ShortPageID) + ALIGNED_LENGTH(2 + entry->klen);
+
+    rootPage->bi.hdr.p0 = newPid.pageNo;
+    rootPage->bi.slot[0] = 0;
+
+    entry = &(rootPage->bi.data[0]);
+    entry->klen = item->klen;
+    entry->spid = item->spid;
+    memmove(entry->kval, item->kval, entry->klen);
+
+    e = BfM_SetDirty(&newPid, PAGE_BUF);
+    if(e) ERRB1(e, &newPid, PAGE_BUF);
+    e = BfM_FreeTrain(&newPid, PAGE_BUF);
+    if(e) ERR(e);
+
+    e = BfM_SetDirty(root, PAGE_BUF);
+    if(e) ERRB1(e, root, PAGE_BUF);
+    e = BfM_FreeTrain(root, PAGE_BUF);
+    if(e) ERR(e);
     
     return(eNOERROR);
     

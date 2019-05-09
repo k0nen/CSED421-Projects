@@ -55,8 +55,8 @@ void dumpOverflow(BtreeOverflow*, PageID*);
  *  composed of root page, internal page, and leaf page.
  *  There are five operations in EduBtM.
  *  EduBtM_Test() test these below operations in EduBtM.
- *  EduBtM_CreateIndex(), BtM_InsertObject(), EduBtM_Fetch(),
- *  BtM_FetchNext(), BtM_DropIndex().
+ *  EduBtM_CreateIndex(), EduBtM_InsertObject(), EduBtM_Fetch(),
+ *  BtM_FetchNext(), EduBtM_DropIndex().
  *
  *
  * Returns:
@@ -77,7 +77,7 @@ Four EduBtM_Test(Four volId, Four handle){
 	IndexID iid;										/* index id */
 	ObjectID oid;										/* object id */
 	PageID 	dumpPage;									/* page identifier for dump */
-	PhysicalFileID pFid;								/* physical file identifier for BtM_DropIndex() */ 
+	PhysicalFileID pFid;								/* physical file identifier for EduBtM_DropIndex() */ 
 	PhysicalIndexID		rootPid;						/* root page identifier */
 	KeyValue	kval;									/* value of key */
 	KeyValue	startKval;								/* start value of key for BtM_FetchNext() */
@@ -146,11 +146,11 @@ Four EduBtM_Test(Four volId, Four handle){
 
 
 
-/* #2 Start the test for BtM_InsertObject */
+/* #2 Start the test for EduBtM_InsertObject */
 	
-	printf("****************************** TEST#2, BtM_InsertObject. ******************************\n");
+	printf("****************************** TEST#2, EduBtM_InsertObject. ******************************\n");
 	/* 200 integer objects are inserted into index */
-    printf("*Test 2_1 : Test for BtM_InsertObject()\n");
+    printf("*Test 2_1 : Test for EduBtM_InsertObject()\n");
 	printf("200 integer objects are inserted into the B+ tree index\n");
 	
 	printf("Press enter key to continue...");
@@ -169,7 +169,7 @@ Four EduBtM_Test(Four volId, Four handle){
 		oid.slotNo = i;
 		oid.unique = i;
 		/* The successful default solution code is called if "Edu" is omitted from the function name in the following line */
-		e = BtM_InsertObject(&catalogEntry, &rootPid, &kdesc, &kval, &oid, NULL, NULL);
+		e = EduBtM_InsertObject(&catalogEntry, &rootPid, &kdesc, &kval, &oid, NULL, NULL);
 		if(e < eNOERROR) ERR(e);
 		printf("The object (key: %d , OID: (%4d, %4d, %4d, %4d)) is inserted into the index.\n", i, oid.volNo, oid.pageNo, oid.slotNo, oid.unique);
 
@@ -179,7 +179,7 @@ Four EduBtM_Test(Four volId, Four handle){
 	printf("Press enter key to continue...");
 	getchar();
 	printf("\n\n");
-	printf("****************************** TEST#2, BtM_InsertObject. ******************************\n");
+	printf("****************************** TEST#2, EduBtM_InsertObject. ******************************\n");
 
 	
 /* #2 End the test */
@@ -196,7 +196,7 @@ Four EduBtM_Test(Four volId, Four handle){
 		switch(operation){
 			case 1:
 				
-				printf("****************************** BtM_InsertObject. ******************************\n");
+				printf("****************************** EduBtM_InsertObject. ******************************\n");
 				
 				while (1) {
 					printf("Enter the key value : ");
@@ -212,18 +212,18 @@ Four EduBtM_Test(Four volId, Four handle){
 				oid.unique = numOfIntegerObject++;
 
 				/* The successful default solution code is called if "Edu" is omitted from the function name in the following line */
-				e = BtM_InsertObject(&catalogEntry, &rootPid, &kdesc, &kval, &oid, NULL, NULL);
+				e = EduBtM_InsertObject(&catalogEntry, &rootPid, &kdesc, &kval, &oid, NULL, NULL);
 				if (e == eDUPLICATEDKEY_BTM) printf("There is the same key in the B+ tree index.\nEduBtM allows only unique keys\n");
 				else if(e < eNOERROR) ERR(e);
 				else printf("The object (key: %d, OID: ( %d, %d, %d, %d)) is inserted into the B+ tree index.\n", 
 						keyValueNumber, oid.volNo, oid.pageNo, oid.slotNo, oid.unique);
 
-                printf("****************************** BtM_InsertObject. ******************************\n");
+                printf("****************************** EduBtM_InsertObject. ******************************\n");
 				break;
 
 			case 2:
 
-				printf("****************************** EduBtM_DeleteObject. ******************************\n");
+				printf("****************************** BtM_DeleteObject. ******************************\n");
 
 				while (1) {
 					printf("Enter the key value : ");
@@ -245,7 +245,7 @@ Four EduBtM_Test(Four volId, Four handle){
 				}
 				else{
 					/* The successful default solution code is called if "Edu" is omitted from the function name in the following line */
-					e = EduBtM_DeleteObject(&catalogEntry, &rootPid, &kdesc, &kval, &cursor.oid, &dlPool, &dlHead);
+					e = BtM_DeleteObject(&catalogEntry, &rootPid, &kdesc, &kval, &cursor.oid, &dlPool, &dlHead);
 					if (e == eNOTSUPPORTED_EDUBTM) printf("Delete operation is not implemented.\n");
 					else if (e == eNOTFOUND_BTM) printf("There is no object that statisfies the condition.\n");
 					else if (e < eNOERROR) ERR(e);
@@ -253,7 +253,7 @@ Four EduBtM_Test(Four volId, Four handle){
 							keyValueNumber, oid.volNo, oid.pageNo, oid.slotNo, oid.unique);
 				}							
 
-				printf("****************************** EduBtM_DeleteObject. ******************************\n");
+				printf("****************************** BtM_DeleteObject. ******************************\n");
 
 				break;
 			case 3:
@@ -431,15 +431,15 @@ Four EduBtM_Test(Four volId, Four handle){
 				break;
 
 			case 5:
-				printf("****************************** BtM_DropIndex. ******************************\n");
+				printf("****************************** EduBtM_DropIndex. ******************************\n");
 				
 				/* set pFid */
 				MAKE_PHYSICALFILEID(pFid, catalogOverlay.fid.volNo, catalogOverlay.firstPage);
 				
 				/* The successful default solution code is called if "Edu" is omitted from the function name in the following line */
-				e = BtM_DropIndex(&pFid, &rootPid, &dlPool, &dlHead);
+				e = EduBtM_DropIndex(&pFid, &rootPid, &dlPool, &dlHead);
 				if (e < eNOERROR) ERR(e);
-				printf("****************************** BtM_DropIndex. ******************************\n");
+				printf("****************************** EduBtM_DropIndex. ******************************\n");
 				break;
 
 			default:
@@ -497,11 +497,11 @@ Four EduBtM_Test(Four volId, Four handle){
 /* #1 End the test */
 
 
-/* #2 Start the test for BtM_InsertObject */
+/* #2 Start the test for EduBtM_InsertObject */
 
-	printf("****************************** TEST#2, BtM_InsertObject. ******************************\n");
+	printf("****************************** TEST#2, EduBtM_InsertObject. ******************************\n");
 	/* 144 variable string objects are inserted into index */
-    printf("*Test 2_1 : Test for BtM_InsertObject()\n");
+    printf("*Test 2_1 : Test for EduBtM_InsertObject()\n");
     printf("144 variable string objects are inserted into the B+ tree index\n");
 
 	printf("Press enter key to continue...");
@@ -540,7 +540,7 @@ Four EduBtM_Test(Four volId, Four handle){
 			oid.slotNo = numOfVariableObject;
 			oid.unique = numOfVariableObject;
 			/* The successful default solution code is called if "Edu" is omitted from the function name in the following line */
-			e = BtM_InsertObject(&catalogEntry, &rootPid, &kdesc, &kval, &oid, NULL, NULL);
+			e = EduBtM_InsertObject(&catalogEntry, &rootPid, &kdesc, &kval, &oid, NULL, NULL);
 			if(e < eNOERROR) ERR(e);
 			else printf("The object (key: %s , OID: (%4d, %4d, %4d, %4d)) is inserted into the index.\n", playerName, oid.volNo, oid.pageNo, oid.slotNo, oid.unique);
 		}
@@ -552,7 +552,7 @@ Four EduBtM_Test(Four volId, Four handle){
 	printf("\n\n");
 
     printf("The objects are inserted into the index\n");
-	printf("****************************** TEST#2, BtM_InsertObject. ******************************\n");
+	printf("****************************** TEST#2, EduBtM_InsertObject. ******************************\n");
 	
 	/* #2 End the test */
 
@@ -567,7 +567,7 @@ Four EduBtM_Test(Four volId, Four handle){
 		switch(operation){
 			case 1:
 				
-				printf("****************************** BtM_InsertObject. ******************************\n");
+				printf("****************************** EduBtM_InsertObject. ******************************\n");
 				
 				
 				printf("Enter the player name :");
@@ -582,17 +582,17 @@ Four EduBtM_Test(Four volId, Four handle){
 				oid.unique = numOfVariableObject++;
 
 				/* The successful default solution code is called if "Edu" is omitted from the function name in the following line */
-				e = BtM_InsertObject(&catalogEntry, &rootPid, &kdesc, &kval, &oid, NULL, NULL);
+				e = EduBtM_InsertObject(&catalogEntry, &rootPid, &kdesc, &kval, &oid, NULL, NULL);
 				if (e == eDUPLICATEDKEY_BTM) printf("There is the same key in the B+ tree index.\nEduBtM allows only unique keys\n");
 				else if (e < eNOERROR) ERR(e);
 				else printf("The object (key: %s , OID: (%4d, %4d, %4d, %4d)) is inserted into the B+ tree index.\n", playerName, oid.volNo, oid.pageNo, oid.slotNo, oid.unique);
 				
-				printf("****************************** BtM_InsertObject. ******************************\n");
+				printf("****************************** EduBtM_InsertObject. ******************************\n");
 				break;
 
             case 2:
 				
-				printf("****************************** EduBtM_DeleteObject. ******************************\n");
+				printf("****************************** BtM_DeleteObject. ******************************\n");
 				
 				printf("Enter the player name : ");
 				getchar();
@@ -613,14 +613,14 @@ Four EduBtM_Test(Four volId, Four handle){
 				else
 				{
 					/* The successful default solution code is called if "Edu" is omitted from the function name in the following line */
-					e = EduBtM_DeleteObject(&catalogEntry, &rootPid, &kdesc, &kval, &cursor.oid, &dlPool, &dlHead);
+					e = BtM_DeleteObject(&catalogEntry, &rootPid, &kdesc, &kval, &cursor.oid, &dlPool, &dlHead);
 					if (e == eNOTFOUND_BTM) printf("There is no object that statisfies the condition.\n");
 					else if (e < eNOERROR) ERR(e);
 					else printf("The object (key: %s, OID: ( %d, %d, %d, %d)) is deleted from the B+ tree index.\n",
 							playerName, oid.volNo, oid.pageNo, oid.slotNo, oid.unique);
 
 				}
-				printf("****************************** EduBtM_DeleteObject. ******************************\n");
+				printf("****************************** BtM_DeleteObject. ******************************\n");
 				
 				break;
 
@@ -794,15 +794,15 @@ Four EduBtM_Test(Four volId, Four handle){
 				break;
 			
 			case 5:
-				printf("****************************** BtM_DropIndex. ******************************\n");
+				printf("****************************** EduBtM_DropIndex. ******************************\n");
 				
 				/* set pFid */
 				MAKE_PHYSICALFILEID(pFid, catalogOverlay.fid.volNo, catalogOverlay.firstPage);
 				
 				/* The successful default solution code is called if "Edu" is omitted from the function name in the following line */
-				e = BtM_DropIndex(&pFid, &rootPid, &dlPool, &dlHead);
+				e = EduBtM_DropIndex(&pFid, &rootPid, &dlPool, &dlHead);
 				if (e < eNOERROR) ERR(e);
-				printf("****************************** BtM_DropIndex. ******************************\n");
+				printf("****************************** EduBtM_DropIndex. ******************************\n");
 				break;
 
 			default:

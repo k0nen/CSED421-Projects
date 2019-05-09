@@ -94,7 +94,58 @@ Four edubtm_LastObject(
             ERR(eNOTSUPPORTED_EDUBTM);
     }
     
+    curPid = *root;
+    e = BfM_GetTrain(&curPid, &apage, PAGE_BUF);
+    if(e) ERR(e);
 
-    return(eNOERROR);
+    // Traverse tree until leaf node
+    while(apage->any.hdr.type & INTERNAL) {
+        // Use rightmost child node
+        iEntryOffset = apage->bi.slot[-(apage->bi.hdr.nSlots - 1)];
+        iEntry = &(apage->bi.data[iEntryOffset]);
+        MAKE_PAGEID(child, curPid.volNo, iEntry->spid);
+
+        e = BfM_FreeTrain(&curPid, PAGE_BUF);
+        if(e) ERR(e);
+        curPid = child;
+        e = BfM_GetTrain(&curPid, &apage, PAGE_BUF);
+        if(e) ERR(e);
+    }
+
+    // Now curPid and apage is leaf node
+    if(apage->bl.hdr.nSlots == 0) {
+        cursor->flag = CURSOR_EOS;
+    }
+    else {
+        // Get last entry
+        lEntryOffset = apage->bl.slot[-(apage->bl.hdr.nSlots - 1)];
+        lEntry = &(apage->bl.data[lEntryOffset]);
+
+        cursor->key.len = lEntry->klen;
+        memcpy(cursor->key.val, lEntry->kval, cursor->key.len);
+
+        // Check stop condition
+        if(stopCompOp == SM_GE || stopCompOp == SM_GT) {
+            cmp = edubtm_KeyCompare(kdesc, &cursor->key, stopKval);
+        }
+
+        if((stopCompOp == SM_GE || stopCompOp == SM_GT)
+            && (cmp == LESS || (cmp == EQUAL && stopCompOp == SM_GT))) {
+            cursor->flag = CURSOR_EOS;
+        }
+        else {
+            cursor->flag = CURSOR_ON;
+            cursor->leaf = curPid;
+            cursor->slotNo = apage->bl.hdr.nSlots - 1;
+
+            alignedKlen = ALIGNED_LENGTH(cursor->key.len);
+            cursor->oid = ((ObjectID *)&lEntry->kval[alignedKlen])[0];
+        }
+    }
+
+    e = BfM_FreeTrain(&curPid, PAGE_BUF);
+    if(e) ERR(e);
+
+
     
 } /* edubtm_LastObject() */
