@@ -111,11 +111,7 @@ Four edubtm_root_insert(
     e = edubtm_InitInternal(root, TRUE, FALSE);
     if(e) ERRB1(e, root, PAGE_BUF);
 
-    printf("123123123123123123\n");
-    // Adjustments
-    rootPage->bi.hdr.nSlots = 1;
-    rootPage->bi.hdr.free = sizeof(ShortPageID) + ALIGNED_LENGTH(2 + entry->klen);
-
+    // Adjustment
     rootPage->bi.hdr.p0 = newPid.pageNo;
     rootPage->bi.slot[0] = 0;
 
@@ -123,6 +119,9 @@ Four edubtm_root_insert(
     entry->klen = item->klen;
     entry->spid = item->spid;
     memmove(entry->kval, item->kval, entry->klen);
+
+    rootPage->bi.hdr.nSlots = 1;
+    rootPage->bi.hdr.free = sizeof(ShortPageID) + ALIGNED_LENGTH(2 + entry->klen);
 
     e = BfM_SetDirty(&newPid, PAGE_BUF);
     if(e) ERRB1(e, &newPid, PAGE_BUF);

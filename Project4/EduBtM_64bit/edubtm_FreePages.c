@@ -93,7 +93,7 @@ Four edubtm_FreePages(
 
         for(i=0; i<apage->bi.hdr.nSlots; i++) {
             iEntryOffset = apage->bi.slot[-i];
-            iEntry = apage->bi.data[iEntryOffset];
+            iEntry = &apage->bi.data[iEntryOffset];
 
             MAKE_PAGEID(tPid, curPid->volNo, iEntry->spid);
             e = edubtm_FreePages(pFid, &tPid, dlPool, dlHead);

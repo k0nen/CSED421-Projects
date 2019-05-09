@@ -70,7 +70,6 @@ Four EduBtM_CreateIndex(
     sm_CatOverlayForBtree *catEntry; /* pointer to Btree file catalog information */
     PhysicalFileID pFid;	/* physical file ID */
 
-    printf("hello\n");
 
     // FileID of BTree file
     e = BfM_GetTrain(catObjForFile, &catPage, PAGE_BUF);

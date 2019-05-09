@@ -143,7 +143,7 @@ Four edubtm_Insert(
         }
         else MAKE_PAGEID(newPid, root->volNo, apage->bi.hdr.p0);
 
-        e = edubtm_Insert(catObjForFile, &newPid, kdesc, kval, oid, f, h, &litem, dlPool, dlHead);
+        e = edubtm_Insert(catObjForFile, &newPid, kdesc, kval, oid, &lf, &lh, &litem, dlPool, dlHead);
         if(e) ERRB1(e, root, PAGE_BUF);
 
         // If child was splitted
@@ -312,7 +312,7 @@ Four edubtm_InsertInternal(
     // No, we need to split this page
     else {
         *h = TRUE;
-        e = edubtm_SplitInternal(catObjForFile, page, high, item, ritem);
+        e = btm_SplitInternal(catObjForFile, page, high, item, ritem);
         if(e) ERR(e);
     }
 

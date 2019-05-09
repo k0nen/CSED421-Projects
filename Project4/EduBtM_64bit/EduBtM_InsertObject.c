@@ -106,7 +106,6 @@ Four EduBtM_InsertObject(
 
     // Root split
     if(lh) {
-        printf("AAAAAA\n");
         e = edubtm_root_insert(catObjForFile, root, &item);
         if(e) ERR(e);
     }

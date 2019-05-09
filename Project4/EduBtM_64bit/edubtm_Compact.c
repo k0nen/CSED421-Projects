@@ -97,7 +97,6 @@ void edubtm_CompactInternalPage(
         apage->slot[-slotNo] = apageDataOffset;
         apageDataOffset += len;
     }
-
     apage->hdr.unused = 0;
     apage->hdr.free = apageDataOffset;
 
@@ -164,7 +163,6 @@ void edubtm_CompactLeafPage(
         apage->slot[-slotNo] = apageDataOffset;
         apageDataOffset += len;
     }
-
     apage->hdr.unused = 0;
     apage->hdr.free = apageDataOffset;
 

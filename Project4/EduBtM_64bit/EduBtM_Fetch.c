@@ -173,14 +173,12 @@ Four edubtm_Fetch(
     e = BfM_GetTrain(root, &apage, PAGE_BUF);
     if(e) ERR(e);
 
-    printf("aaaa\n");
 
     // Internal node
     if(apage->any.hdr.type & INTERNAL) {
         edubtm_BinarySearchInternal(&(apage->bi), kdesc, startKval, &idx);
         found = FALSE;
 
-        printf("Fetch internal node - idx is %d, found is %d\n", idx, found);
 
         if(idx > -1) {
             iEntryOffset = apage->bi.slot[-idx];
@@ -189,7 +187,7 @@ Four edubtm_Fetch(
         }
         else MAKE_PAGEID(child, root->volNo, apage->bi.hdr.p0);
 
-        e = EduBtM_Fetch(&child, kdesc, startKval, startCompOp, stopKval, stopCompOp, cursor);
+        e = edubtm_Fetch(&child, kdesc, startKval, startCompOp, stopKval, stopCompOp, cursor);
         if(e) ERRB1(e, root, PAGE_BUF);
         e = BfM_FreeTrain(root, PAGE_BUF);
         if(e) ERR(e);
@@ -197,7 +195,6 @@ Four edubtm_Fetch(
     // Leaf node
     else if(apage->any.hdr.type & LEAF) {
         found = edubtm_BinarySearchLeaf(&(apage->bi), kdesc, startKval, &idx);
-        printf("Fetch leaf node - idx is %d, found is %d\n", idx, found);
 
         slotNo = idx;
         leafPid = root;
@@ -263,7 +260,6 @@ Four edubtm_Fetch(
 
         // If found, then set cursor
         if(found) {
-            printf("found!\n");
             cursor->flag = CURSOR_ON;
             cursor->slotNo = slotNo;
             cursor->leaf = *leafPid;
@@ -287,7 +283,6 @@ Four edubtm_Fetch(
                     cmp == LESS && (stopCompOp == SM_GT || stopCompOp == SM_GE) ||
                     cmp == GREAT && (stopCompOp == SM_LT || stopCompOp == SM_LE)
                 ) {
-                    printf("caught!");
                     cursor->flag = CURSOR_EOS;
                 }
             }
