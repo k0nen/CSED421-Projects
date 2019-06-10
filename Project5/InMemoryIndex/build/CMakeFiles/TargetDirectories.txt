@@ -1,3 +1,0 @@
-/home/kjhong/InMemoryIndex/build/CMakeFiles/rebuild_cache.dir
-/home/kjhong/InMemoryIndex/build/CMakeFiles/edit_cache.dir
-/home/kjhong/InMemoryIndex/build/CMakeFiles/workload.dir
