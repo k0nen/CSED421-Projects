@@ -56,7 +56,7 @@ void dumpOverflow(BtreeOverflow*, PageID*);
  *  There are five operations in EduBtM.
  *  EduBtM_Test() test these below operations in EduBtM.
  *  EduBtM_CreateIndex(), EduBtM_InsertObject(), EduBtM_Fetch(),
- *  BtM_FetchNext(), EduBtM_DropIndex().
+ *  EduBtM_FetchNext(), EduBtM_DropIndex().
  *
  *
  * Returns:
@@ -80,16 +80,16 @@ Four EduBtM_Test(Four volId, Four handle){
 	PhysicalFileID pFid;								/* physical file identifier for EduBtM_DropIndex() */ 
 	PhysicalIndexID		rootPid;						/* root page identifier */
 	KeyValue	kval;									/* value of key */
-	KeyValue	startKval;								/* start value of key for BtM_FetchNext() */
-	KeyValue	stopKval;								/* stop value of key for BtM_FetchNext() */
+	KeyValue	startKval;								/* start value of key for EduBtM_FetchNext() */
+	KeyValue	stopKval;								/* stop value of key for EduBtM_FetchNext() */
 	KeyDesc		kdesc;									/* key descriptor */
-	Four		startCompOp;							/* start condition for BtM_FetchNext() */
-	Four		stopCompOp;								/* stop condition for BtM_FetchNext() */
+	Four		startCompOp;							/* start condition for EduBtM_FetchNext() */
+	Four		stopCompOp;								/* stop condition for EduBtM_FetchNext() */
 	Four		compOp;									/* conditino for EduBtM_Fetch() */
 	Four		keyValueNumber = 0;						/* value of integer key */	
     sm_CatOverlayForBtree catalogOverlay; 				/* Btree part of the catalog entry */
-	BtreeCursor cursor;									/* cursor for BtM_FetchNext() */
-	BtreeCursor next;									/* next object cursor from BtM_FetchNext() */
+	BtreeCursor cursor;									/* cursor for EduBtM_FetchNext() */
+	BtreeCursor next;									/* next object cursor from EduBtM_FetchNext() */
     Two 		lengthOfPlayerName;						/* length of variable key */
 	char 		playerName[MAXPLAYERNAME];				/* value of  variable key */
 	char		waste[MAXPLAYERNAME];					/* waste value */
@@ -366,7 +366,7 @@ Four EduBtM_Test(Four volId, Four handle){
 						case 1:
 							
 							/* The successful default solution code is called if "Edu" is omitted from the function name in the following line */
-							e = BtM_FetchNext(&rootPid, &kdesc, &stopKval, stopCompOp, &cursor, &next);
+							e = EduBtM_FetchNext(&rootPid, &kdesc, &stopKval, stopCompOp, &cursor, &next);
 							if (e < eNOERROR) ERR(e);
 							else if (next.flag == CURSOR_EOS) {
 								printf("There is no object that satisfies the condition.\n");
@@ -730,7 +730,7 @@ Four EduBtM_Test(Four volId, Four handle){
 					switch(scanOperation){
 						case 1:
 							/* The successful default solution code is called if "Edu" is omitted from the function name in the following line */
-							e = BtM_FetchNext(&rootPid, &kdesc, &stopKval, stopCompOp, &cursor, &next);
+							e = EduBtM_FetchNext(&rootPid, &kdesc, &stopKval, stopCompOp, &cursor, &next);
 							if (e < eNOERROR) ERR(e);
 							else if (next.flag == CURSOR_EOS) {
 								printf("There is no object that satisfies the condition.\n");

@@ -107,6 +107,8 @@ Four EduBtM_FetchNext(
             ERR(eNOTSUPPORTED_EDUBTM);
     }
 
+    e = edubtm_FetchNext(kdesc, kval, compOp, current, next);
+    if (e<0) ERR(e);
     
     return(eNOERROR);
     
@@ -149,6 +151,7 @@ Four edubtm_FetchNext(
     BtreeLeaf 		*apage;		/* pointer to a buffer holding a leaf page */
     BtreeOverflow 	*opage;		/* pointer to a buffer holding an overflow page */
     btm_LeafEntry 	*entry;		/* pointer to a leaf entry */    
+    Two         idx;
     
     
     /* Error check whether using not supported functionality by EduBtM */
@@ -159,7 +162,77 @@ Four edubtm_FetchNext(
             ERR(eNOTSUPPORTED_EDUBTM);
     }
 
-    
+    leaf = current->leaf;
+    overflow = leaf;
+    e = BfM_GetTrain(&leaf, &apage, PAGE_BUF);
+    if (e<0) ERR(e);
+
+    next->flag = CURSOR_ON;
+    idx = current->slotNo;
+    if(compOp == SM_EQ) next->flag = CURSOR_EOS;
+    else if(compOp == SM_LT || compOp == SM_LE) idx++;
+    else if(compOp == SM_GT || compOp == SM_GE) idx--; 
+
+    if(next->flag != CURSOR_EOS) {
+        // Check if idx is out of range
+        if(idx < 0) {
+            if(apage->hdr.prevPage != NIL) {
+                MAKE_PAGEID(overflow, leaf.volNo, apage->hdr.prevPage);
+                e = BfM_FreeTrain(&leaf, PAGE_BUF);
+                if(e) ERR(e);
+                e = BfM_GetTrain(&overflow, &apage, PAGE_BUF);
+                if(e) ERR(e);
+                idx = apage->hdr.nSlots - 1;
+            }
+            else {
+                next->flag = CURSOR_EOS;
+            }
+        }
+        else if(idx >= apage->hdr.nSlots) {
+            if(apage->hdr.nextPage != NIL) {
+                MAKE_PAGEID(overflow, leaf.volNo, apage->hdr.nextPage);
+                e = BfM_FreeTrain(&leaf, PAGE_BUF);
+                if(e) ERR(e);
+                e = BfM_GetTrain(&overflow, &apage, PAGE_BUF);
+                if(e) ERR(e);
+                idx = 0;
+            }
+            else {
+                next->flag = CURSOR_EOS;
+            }
+        }
+        else {
+            e = BfM_FreeTrain(&leaf, PAGE_BUF);
+            if(e) ERR(e);
+            e = BfM_GetTrain(&overflow, &apage, PAGE_BUF);
+            if(e) ERR(e);
+        }
+    }
+
+    if(next->flag == CURSOR_EOS) {
+        e = BfM_FreeTrain(&leaf, PAGE_BUF);
+        if(e) ERR(e);
+    }
+    else {
+        entry = apage->data + apage->slot[-idx];
+		alignedKlen = ALIGNED_LENGTH(entry->klen);
+		memcpy(&next->oid, &entry->kval + alignedKlen, sizeof(ObjectID));
+		memcpy(&next->key, &entry->klen, sizeof(KeyValue));
+		next->leaf = overflow;
+		next->slotNo = idx;
+
+        // End of search?
+        cmp = edubtm_KeyCompare(kdesc, &next->key, kval);
+        if((compOp == SM_LT && cmp != LESS)
+            || (compOp == SM_LE && cmp == GREATER)
+            || (compOp == SM_GT && cmp != GREATER)
+            || (compOp == SM_GE && cmp == LESS))
+            next->flag = CURSOR_EOS;
+
+        e = BfM_FreeTrain(&overflow, PAGE_BUF);
+        if(e) ERR(e);
+    }
+
     return(eNOERROR);
     
 } /* edubtm_FetchNext() */
