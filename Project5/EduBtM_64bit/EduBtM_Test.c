@@ -223,7 +223,7 @@ Four EduBtM_Test(Four volId, Four handle){
 
 			case 2:
 
-				printf("****************************** BtM_DeleteObject. ******************************\n");
+				printf("****************************** EduBtM_DeleteObject. ******************************\n");
 
 				while (1) {
 					printf("Enter the key value : ");
@@ -245,7 +245,7 @@ Four EduBtM_Test(Four volId, Four handle){
 				}
 				else{
 					/* The successful default solution code is called if "Edu" is omitted from the function name in the following line */
-					e = BtM_DeleteObject(&catalogEntry, &rootPid, &kdesc, &kval, &cursor.oid, &dlPool, &dlHead);
+					e = EduBtM_DeleteObject(&catalogEntry, &rootPid, &kdesc, &kval, &cursor.oid, &dlPool, &dlHead);
 					if (e == eNOTSUPPORTED_EDUBTM) printf("Delete operation is not implemented.\n");
 					else if (e == eNOTFOUND_BTM) printf("There is no object that statisfies the condition.\n");
 					else if (e < eNOERROR) ERR(e);
@@ -253,7 +253,7 @@ Four EduBtM_Test(Four volId, Four handle){
 							keyValueNumber, oid.volNo, oid.pageNo, oid.slotNo, oid.unique);
 				}							
 
-				printf("****************************** BtM_DeleteObject. ******************************\n");
+				printf("****************************** EduBtM_DeleteObject. ******************************\n");
 
 				break;
 			case 3:
@@ -592,7 +592,7 @@ Four EduBtM_Test(Four volId, Four handle){
 
             case 2:
 				
-				printf("****************************** BtM_DeleteObject. ******************************\n");
+				printf("****************************** EduBtM_DeleteObject. ******************************\n");
 				
 				printf("Enter the player name : ");
 				getchar();
@@ -613,14 +613,14 @@ Four EduBtM_Test(Four volId, Four handle){
 				else
 				{
 					/* The successful default solution code is called if "Edu" is omitted from the function name in the following line */
-					e = BtM_DeleteObject(&catalogEntry, &rootPid, &kdesc, &kval, &cursor.oid, &dlPool, &dlHead);
+					e = EduBtM_DeleteObject(&catalogEntry, &rootPid, &kdesc, &kval, &cursor.oid, &dlPool, &dlHead);
 					if (e == eNOTFOUND_BTM) printf("There is no object that statisfies the condition.\n");
 					else if (e < eNOERROR) ERR(e);
 					else printf("The object (key: %s, OID: ( %d, %d, %d, %d)) is deleted from the B+ tree index.\n",
 							playerName, oid.volNo, oid.pageNo, oid.slotNo, oid.unique);
 
 				}
-				printf("****************************** BtM_DeleteObject. ******************************\n");
+				printf("****************************** EduBtM_DeleteObject. ******************************\n");
 				
 				break;
 
