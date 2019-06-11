@@ -239,8 +239,35 @@ Four edubtm_InsertLeaf(
     
     /*@ Initially the flags are FALSE */
     *h = *f = FALSE;
-    
 
+    // Check for duplicate
+    found = edubtm_BinarySearchLeaf(page, kdesc, kval, &idx);
+    if(found) ERR(eDUPLICATEDKEY_BTM);
+
+    // Is there enough space in page?
+    entryLen = sizeof(ShortPageID) + ALIGNED_LENGTH(2 + item->klen);
+    if(entryLen + 2 <= BI_FREE(page)) {
+        // Compact page if necessary
+        if(entryLen + 2 > BI_CFREE(page))
+            edubtm_CompactLeafPage(page, NIL);
+
+        for(i = page->hdr.nSlots - 1; i > idx; i--)
+            page->slot[-i-1] = page->slot[-i];
+
+        // Store new item in slot
+        entry = &page->data[page->hdr.free];
+        memcpy(entry, &leaf.nObjects, entryLen - sizeof(ObjectID));
+
+        page->slot[-idx-1] = page->hdr.free;
+        page->hdr.free += entryLen;
+        page->hdr.nSlots++;
+    }
+    // No, we need to split this page
+    else {
+        e = btm_SplitLeaf(catObjForFile, pid, page, idx, &leaf, item);
+        if(e) ERR(e);
+        *h = TRUE;
+    }
 
     return(eNOERROR);
     
