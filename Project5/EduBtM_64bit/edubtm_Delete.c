@@ -127,12 +127,49 @@ Four edubtm_Delete(
 
         
     *h = *f = FALSE;
-    
-    
-    /* Delete following 2 lines before implement this function */
-    printf("Implementation of delete operation is optional (not compulsory),\n");
-    printf("and delete operation has not been implemented yet.\n");
 
+    e = BfM_GetTrain(root, &rpage, PAGE_BUF);
+    if(e) ERR(e);
+    e = BfM_GetTrain(catObjForFile, &catPage, PAGE_BUF);
+    if(e) ERR(e);
+    GET_PTR_TO_CATENTRY_FOR_BTREE(catObjForFile, catPage, catEntry);
+    MAKE_PHYSICALFILEID(pFid, catEntry->fid.volNo, catEntry->firstPage);
+    // If this page is leaf
+    if(rpage->any.hdr.type & LEAF) {
+        e = edubtm_DeleteLeaf(&pFid, root, rpage, kdesc, kval, oid, f, h, &litem, dlPool, dlHead);
+        if(e) ERRB1(e, root, PAGE_BUF);
+    }
+    // If this page is internal
+    else if(rpage->any.hdr.type & INTERNAL) {
+        edubtm_BinarySearchInternal(rpage, kdesc, kval, &idx);
+
+        // Get child page
+        child.volNo = root->volNo;
+        if(idx >= 0) {
+            iEntry = &rpage->bi.data[rpage->bi.slot[-idx]];
+            child.pageNo = iEntry->spid;
+        }
+        else {
+            child.pageNo = rpage->bi.hdr.p0;
+        }
+        
+        e = edubtm_Delete(catObjForFile, &child, kdesc, kval, oid, &lf, &lh, &litem, dlPool, dlHead);
+        if(e) ERRB1(e, root, PAGE_BUF);
+        
+        // Check for underflow
+        if(lf) {
+            e = btm_Underflow(&pFid, rpage, &child, idx, f, h, &item, dlPool, dlHead);
+            if(e) ERRB1(e, root, PAGE_BUF);
+            e = BfM_SetDirty(root, PAGE_BUF);
+            if(e) ERRB1(e, root, PAGE_BUF);
+        }
+    }
+    else ERR(eBADBTREEPAGE_BTM);
+
+    e = BfM_FreeTrain(root, PAGE_BUF);
+    if(e) ERR(e);
+    e = BfM_FreeTrain(catObjForFile, PAGE_BUF);
+    if(e) ERR(e);
 
     return(eNOERROR);
     
@@ -201,11 +238,27 @@ Four edubtm_DeleteLeaf(
             ERR(eNOTSUPPORTED_EDUBTM);
     }
 
+    found = edubtm_BinarySearchInternal(apage, kdesc, kval, &idx);
+    if(!found) ERR(eNOTFOUND_BTM);
 
-    /* Delete following 2 lines before implement this function */
-    printf("Implementation of delete operation is optional (not compulsory),\n");
-    printf("and delete operation has not been implemented yet.\n");
+    lEntryOffset = apage->slot[-idx];
+    lEntry = &apage->data[lEntryOffset];
+    alignedKlen = ALIGNED_LENGTH(lEntry->klen);
 
+    // Compact slot index
+    for(i = idx; i < apage->hdr.nSlots - 1; i++)
+        apage->slot[-i] = apage->slot[-i-1];
+    
+    entryLen = alignedKlen + OBJECTID_SIZE + BTM_LEAFENTRY_FIXED;
+    apage->hdr.nSlots--;
+    apage->hdr.unused += entryLen;
+
+    // Check for underflow
+    if(BL_FREE(apage) > BL_HALF)
+        *f = TRUE;
+
+    e = BfM_SetDirty(pid, PAGE_BUF);
+    if(e) ERR(e);
 	      
     return(eNOERROR);
     
